@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "TeslaBackendAPI",
     platforms: [
-      .macOS(.v13),
+      .macOS(.v12),
     ],
     products: [
         .library(
