@@ -13,11 +13,11 @@ import FoundationNetworking
 
 var loggingEnabled = false
 
-enum TeslaAPIError: Error, LocalizedError {
+public enum TeslaAPIError: Error, LocalizedError {
   case badURL
   case network(HTTPStatusCode)
   
-  var errorDescription: String? {
+  public var errorDescription: String? {
     switch self {
     case .badURL: return "bad URL"
     case .network(let code): return "network status: \(code)"
