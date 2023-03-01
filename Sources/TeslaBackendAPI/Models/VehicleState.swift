@@ -104,7 +104,7 @@ public struct VehicleState: Codable {
   public let sunRoofPercentageOpen: Int? // null if not installed
   public let sunRoofState: String?
 	
-  public let timeStamp: Double?
+  public let timeStamp: TimeStamp
 	
   public let valetMode: Bool?
   public let valetPinNeeded: Bool?

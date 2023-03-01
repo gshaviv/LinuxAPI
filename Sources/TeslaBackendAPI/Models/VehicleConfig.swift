@@ -22,7 +22,7 @@ public struct VehicleConfig: Codable {
   public let spoilerType: String?
   public let sunRoofInstalled: Int?
   public let thirdRowSeats: String?
-  public let timeStamp: Double?
+  public let timeStamp: TimeStamp
   public let trimBadging: String?
   public let wheelType: String?
 

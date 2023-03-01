@@ -14,7 +14,7 @@ public struct GuiSettings: Codable {
   public let chargeRateUnits: String?
   public let time24Hours: Bool?
   public let rangeDisplay: String?
-  public let timeStamp: Double?
+  public let timeStamp: TimeStamp
 
   private enum CodingKeys: String, CodingKey {
     case distanceUnits = "gui_distance_units"

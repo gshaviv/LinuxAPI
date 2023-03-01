@@ -9,16 +9,7 @@ import Foundation
 
 public struct Distance: Codable {
   public var value: Measurement<UnitLength>
-  
-  public init(miles: Double?) {
-    let tempValue = miles ?? 0.0
-    value = Measurement(value: tempValue, unit: UnitLength.miles)
-  }
-
-  public init(kms: Double) {
-    value = Measurement(value: kms, unit: UnitLength.kilometers)
-  }
-  
+    
   public init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
     if let tempValue = try? container.decode(Double.self) {
@@ -33,21 +24,12 @@ public struct Distance: Codable {
     try container.encode(value.converted(to: .miles).value)
   }
   
-  public var miles: Double { return value.converted(to: .miles).value }
-  public var kms: Double { return value.converted(to: .kilometers).value }
+  public var miles: Double { value.converted(to: .miles).value }
+  public var kms: Double { value.converted(to: .kilometers).value }
 }
 
 public struct Speed: Codable {
   public var value: Measurement<UnitSpeed>
-  
-  public init(milesPerHour: Double?) {
-    let tempValue = milesPerHour ?? 0.0
-    value = Measurement(value: tempValue, unit: UnitSpeed.milesPerHour)
-  }
-
-  public init(kilometersPerHour: Double) {
-    value = Measurement(value: kilometersPerHour, unit: UnitSpeed.kilometersPerHour)
-  }
   
   public init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
@@ -63,8 +45,8 @@ public struct Speed: Codable {
     try container.encode(value.converted(to: .milesPerHour).value)
   }
   
-  public var mph: Double { return value.converted(to: .milesPerHour).value }
-  public var kmh: Double { return value.converted(to: .kilometersPerHour).value }
+  public var mph: Double { value.converted(to: .milesPerHour).value }
+  public var kmh: Double { value.converted(to: .kilometersPerHour).value }
 }
 
 public struct Pressure: Codable {
@@ -84,21 +66,12 @@ public struct Pressure: Codable {
     try container.encode(value.converted(to: .bars).value)
   }
   
-  public var bar: Double { return value.converted(to: .bars).value }
-  public var psi: Double { return value.converted(to: .poundsForcePerSquareInch).value }
+  public var bar: Double { value.converted(to: .bars).value }
+  public var psi: Double { value.converted(to: .poundsForcePerSquareInch).value }
 }
 
 public struct Temperature: Codable {
   public var value: Measurement<UnitTemperature>
-  
-  public init(celsius: Double?) {
-    let tempValue = celsius ?? 0.0
-    value = Measurement<UnitTemperature>(value: tempValue, unit: .celsius)
-  }
-  
-  public init(fahrenheit: Double) {
-    value = Measurement<UnitTemperature>(value: fahrenheit, unit: .fahrenheit)
-  }
   
   public init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
@@ -114,6 +87,25 @@ public struct Temperature: Codable {
     try container.encode(value.converted(to: .celsius).value)
   }
   
-  public var celsius: Double { return value.converted(to: .celsius).value }
-  public var fahrenheit: Double { return value.converted(to: .fahrenheit).value }
+  public var celsius: Double { value.converted(to: .celsius).value }
+  public var fahrenheit: Double { value.converted(to: .fahrenheit).value }
+}
+
+public struct TimeStamp: Codable {
+  public var value: TimeInterval
+  
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    let tempValue = try container.decode(Double.self)
+    value = tempValue / 1000
+  }
+  
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.singleValueContainer()
+    try container.encode(value * 1000)
+  }
+  
+  public var ms: Int { Int(value * 1000) }
+  public var timeInterval: Double { value }
+  public var seoncs: Double { value }
 }

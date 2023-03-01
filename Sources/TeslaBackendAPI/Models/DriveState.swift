@@ -10,7 +10,7 @@ public struct DriveState: Codable {
   }
 
   public let shiftState: ShiftState?
-  public let speed: Double?
+  public let speed: Speed?
   public let latitude: Double
   public let longitude: Double
   public let heading: Double
@@ -20,7 +20,7 @@ public struct DriveState: Codable {
   public var nativeLocationSupported: Bool { return nativeLocationSupportedInt == 1 }
   public let nativeType: String?
   public let gpsDate: Date?
-  public let timeStamp: Double?
+  public let timeStamp: TimeStamp
   public let power: Int?
 
   private enum CodingKeys: String, CodingKey {

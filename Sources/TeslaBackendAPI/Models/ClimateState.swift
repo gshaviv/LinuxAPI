@@ -51,7 +51,7 @@ public struct ClimateState: Codable {
   public let isPreconditioning: Bool?
   public let smartPreconditioning: Bool?
 
-  public let timeStamp: Double?
+  public let timeStamp: TimeStamp
 
   private enum CodingKeys: String, CodingKey {
     case batteryHeater = "battery_heater"

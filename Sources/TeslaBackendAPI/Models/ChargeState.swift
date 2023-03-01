@@ -116,7 +116,7 @@ public struct ChargeState: Codable {
    Only valid while charging
    */
   public let timeToFullCharge: Double?
-  public let timeStamp: Double?
+  public let timeStamp: TimeStamp
 	
   public let tripCharging: Bool?
 	
