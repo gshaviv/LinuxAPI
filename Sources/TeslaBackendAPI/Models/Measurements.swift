@@ -107,5 +107,5 @@ public struct TimeStamp: Codable {
   
   public var ms: Int { Int(value * 1000) }
   public var timeInterval: Double { value }
-  public var seoncs: Double { value }
+  public var seconds: Double { value }
 }
