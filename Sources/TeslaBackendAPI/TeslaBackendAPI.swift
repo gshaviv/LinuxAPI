@@ -35,7 +35,7 @@ public struct TeslaBackendAPI {
     try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "data_request/vehicle_config", token: token, onTokenRefresh: onRefresh)
   }
   
-  public func getAllVehicleStates(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> VehicleWithStates {
+  public func getAllVehicleStates(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> VehicleStates {
     try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "vehicle_data", token: token, onTokenRefresh: onRefresh)
   }
 }

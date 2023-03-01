@@ -138,7 +138,12 @@ final class TeslaBackendAPITests: XCTestCase {
   
   func testAllStates() async {
     do {
-      let _ = try await api.getAllVehicleStates(id: vehicleID, token: token, onRefresh: onRefresh)
+      let a = try await api.getAllVehicleStates(id: vehicleID, token: token, onRefresh: onRefresh)
+      XCTAssertNotNil(a.driveState,"nil drive state")
+      XCTAssertNotNil(a.climateState, "nil climate state")
+      XCTAssertNotNil(a.chargeState, "nil chargeState")
+      XCTAssertNotNil(a.vehicleState,"nil vehicle state")
+      XCTAssertEqual(a.vin, "LRW3E7FA5MC306961", "vin mismatch")
     } catch let e as DecodingError {
       XCTFail("Decoding Error: \(e.description)")
     } catch {
