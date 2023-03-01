@@ -9,6 +9,14 @@ import Foundation
 
 public struct Distance: Codable {
   public var value: Measurement<UnitLength>
+  
+  init(kms value: Double = 0) {
+    self.value = Measurement(value: value, unit: .kilometers)
+  }
+  
+  init(miles value: Double) {
+    self.value = Measurement(value: value, unit: .miles)
+  }
     
   public init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
@@ -31,6 +39,14 @@ public struct Distance: Codable {
 public struct Speed: Codable {
   public var value: Measurement<UnitSpeed>
   
+  init(kmh value: Double = 0) {
+    self.value = Measurement(value: value, unit: .kilometersPerHour)
+  }
+  
+  init(mph value: Double) {
+    self.value = Measurement(value: value, unit: .milesPerHour)
+  }
+  
   public init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
     if let tempValue = try? container.decode(Double.self) {
@@ -52,6 +68,14 @@ public struct Speed: Codable {
 public struct Pressure: Codable {
   public var value: Measurement<UnitPressure>
   
+  init(psi value: Double = 0) {
+    self.value = Measurement(value: value, unit: .poundsForcePerSquareInch)
+  }
+  
+  init(bar value: Double) {
+    self.value = Measurement(value: value, unit: .bars)
+  }
+  
   public init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
     if let tempValue = try? container.decode(Double.self) {
@@ -72,6 +96,14 @@ public struct Pressure: Codable {
 
 public struct Temperature: Codable {
   public var value: Measurement<UnitTemperature>
+  
+  init(celsius value: Double = 0) {
+    self.value = Measurement(value: value, unit: .celsius)
+  }
+  
+  init(fahrenheit value: Double) {
+    self.value = Measurement(value: value, unit: .fahrenheit)
+  }
   
   public init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
