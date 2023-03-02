@@ -2,7 +2,7 @@
 import Foundation
 
 public class Vehicle: Codable {
-  public enum State: Codable {
+  public enum State: Codable, Equatable {
     case online
     case sleeping
     case other(String)
@@ -45,10 +45,24 @@ public class Vehicle: Codable {
     
     public static func == (lhs: State, rhs: String) -> Bool {
       switch lhs {
-      case .online where rhs == "online": return true
-      case .sleeping where rhs == "asleep": return true
-      case .other(let value) where rhs == value: return true
+      case .online where rhs == "online",
+           .sleeping where rhs == "asleep" || rhs == "sleeping":
+        return true
+      case .other(let value) where rhs == value:
+        return true
       default: return false
+      }
+    }
+    
+    public static func == (lhs: State, rhs: State) -> Bool {
+      switch (lhs, rhs) {
+      case (.online, .online),
+           (.sleeping, .sleeping):
+        return true
+      case (.other(let l), .other(let r)) where l == r:
+        return true
+      default:
+        return false
       }
     }
   }
