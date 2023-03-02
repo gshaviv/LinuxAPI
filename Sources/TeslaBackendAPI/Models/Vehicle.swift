@@ -28,6 +28,29 @@ public class Vehicle: Codable {
         try container.encode(value)
       }
     }
+    
+    var isSleeping: Bool {
+      switch self {
+      case .sleeping: return true
+      default: return false
+      }
+    }
+    
+    var isOnline: Bool {
+      switch self {
+      case .online: return true
+      default: return false
+      }
+    }
+    
+    static func == (lhs: State, rhs: String) -> Bool {
+      switch lhs {
+      case .online where rhs == "online": return true
+      case .sleeping where rhs == "asleep": return true
+      case .other(let value) where rhs == value: return true
+      default: return false
+      }
+    }
   }
 
   public let backseatToken: String?
