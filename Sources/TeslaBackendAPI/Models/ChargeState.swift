@@ -104,8 +104,8 @@ public struct ChargeState: Codable {
   public let notEnoughPowerToHeat: Bool?
 	
   public let scheduledChargingPending: Bool?
-  public let scheduledChargingStartTime: TimeInterval?
-  public let scheduledDepartureTime: TimeInterval?
+  public let scheduledChargingStartTime: Date?
+  public let scheduledDepartureTime: Date?
   public let offPeakChargingEnabled: Bool?
   public let offPeakChargingTimes: ScheduledChargingTimes?
   public let offPeakHoursEndTime: Int?
