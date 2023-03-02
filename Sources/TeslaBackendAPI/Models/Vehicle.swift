@@ -2,11 +2,19 @@
 import Foundation
 
 public class Vehicle: Codable {
-  public enum State: Codable, Equatable {
+  public enum State: Codable, Equatable, CustomStringConvertible {
     case online
     case sleeping
     case other(String)
     
+    public var description: String {
+      switch self {
+      case .online: return "online"
+      case .sleeping: return "asleep"
+      case .other(let v): return v
+      }
+    }
+
     public init(from decoder: Decoder) throws {
       let container = try decoder.singleValueContainer()
       let string = try container.decode(String.self)
@@ -19,14 +27,7 @@ public class Vehicle: Codable {
     
     public func encode(to encoder: Encoder) throws {
       var container = encoder.singleValueContainer()
-      switch self {
-      case .online:
-        try container.encode("online")
-      case .sleeping:
-        try container.encode("asleep")
-      case .other(let value):
-        try container.encode(value)
-      }
+      try container.encode(description)
     }
     
     public var isSleeping: Bool {
