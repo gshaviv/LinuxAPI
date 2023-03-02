@@ -29,21 +29,21 @@ public class Vehicle: Codable {
       }
     }
     
-    var isSleeping: Bool {
+    public var isSleeping: Bool {
       switch self {
       case .sleeping: return true
       default: return false
       }
     }
     
-    var isOnline: Bool {
+    public var isOnline: Bool {
       switch self {
       case .online: return true
       default: return false
       }
     }
     
-    static func == (lhs: State, rhs: String) -> Bool {
+    public static func == (lhs: State, rhs: String) -> Bool {
       switch lhs {
       case .online where rhs == "online": return true
       case .sleeping where rhs == "asleep": return true
