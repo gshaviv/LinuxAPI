@@ -2,6 +2,34 @@
 import Foundation
 
 public class Vehicle: Codable {
+  public enum State: Codable {
+    case online
+    case sleeping
+    case other(String)
+    
+    public init(from decoder: Decoder) throws {
+      let container = try decoder.singleValueContainer()
+      let string = try container.decode(String.self)
+      switch string {
+      case "online": self = .online
+      case "asleep": self = .sleeping
+      default: self = .other(string)
+      }
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+      var container = encoder.singleValueContainer()
+      switch self {
+      case .online:
+        try container.encode("online")
+      case .sleeping:
+        try container.encode("asleep")
+      case .other(let value):
+        try container.encode(value)
+      }
+    }
+  }
+
   public let backseatToken: String?
   public let backseatTokenUpdatedAt: Date?
   public let calendarEnabled: Bool
@@ -11,7 +39,7 @@ public class Vehicle: Codable {
   public let idS: String?
   public let inService: Bool
   public let optionCodes: String?
-  public let state: String
+  public let state: State
   public let tokens: [String]?
   public let vehicleID: Int64
   public let vin: String
