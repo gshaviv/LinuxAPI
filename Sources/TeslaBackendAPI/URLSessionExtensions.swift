@@ -31,7 +31,7 @@ extension URLSession {
           return continuation.resume(throwing: error)
         }
 
-        continuation.resume(returning: (data, response))
+        continuation.resume(returning: data)
       }
 
       task.resume()
@@ -56,7 +56,7 @@ extension URLSession {
           return continuation.resume(throwing: error)
         }
         
-        continuation.resume(returning: (data, response))
+        continuation.resume(returning: data)
       }
       
       task.resume()
