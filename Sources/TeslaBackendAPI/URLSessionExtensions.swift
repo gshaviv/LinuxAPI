@@ -22,9 +22,11 @@ extension URLSession {
         }
         guard let response else {
           continuation.resume(throwing: URLError(.badServerResponse))
+          return
         }
         guard response.code == .ok else {
-          throw HTTPError.statusCode(response.code)
+          continuation.resume(throwing: HTTPError.statusCode(response.code))
+          return
         }
         guard let data else {
           let error = URLError(.badServerResponse)
@@ -40,16 +42,18 @@ extension URLSession {
   
   func data(for urlRequest: URLRequest) async throws -> Data {
     try await withCheckedThrowingContinuation { continuation in
-      let task = self.dataTask(for: urlRequest) { data, response, error in
+      let task = self.dataTask(with: urlRequest) { data, response, error in
         if let error {
           continuation.resume(throwing: error)
           return
         }
         guard let response else {
           continuation.resume(throwing: URLError(.badServerResponse))
+          return
         }
         guard response.code == .ok else {
-          throw HTTPError.statusCode(response.code)
+          continuation.resume(throwing: HTTPError.statusCode(response.code))
+          return
         }
         guard let data else {
           let error = URLError(.badServerResponse)
@@ -74,7 +78,7 @@ extension URLSession {
     }
     return data
   }
-  
+
   func data(for urlRequst: URLRequest) async throws -> Data {
     let (data, response) = try await self.data(for: urlRequst)
     guard response.code == .ok else {
