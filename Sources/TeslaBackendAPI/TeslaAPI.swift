@@ -16,11 +16,13 @@ var loggingEnabled = false
 public enum TeslaAPIError: Error, LocalizedError {
   case badURL
   case network(HTTPStatusCode)
+  case refreshTokenMissing
   
   public var errorDescription: String? {
     switch self {
     case .badURL: return "bad URL"
     case .network(let code): return "network status: \(code)"
+    case .refreshTokenMissing: return "Refresh token missing"
     }
   }
 }
@@ -37,7 +39,7 @@ enum HTTPMethod: String {
 
 internal enum TeslaAPI {
   private static let host = "https://owner-api.teslamotors.com"
-  private static let authHost = "https://auth.tesla.com"
+  fileprivate static let authHost = "https://auth.tesla.com"
   private static let session: URLSession = {
     let config = URLSessionConfiguration.default
     return URLSession(configuration: config)
@@ -89,12 +91,11 @@ internal enum TeslaAPI {
     do {
       data = try await session.data(for: request)
     } catch HTTPError.statusCode(.unauthorized) {
-      guard let onTokenRefresh, let token, let refreshToken = token.refreshToken else {
+      guard let onTokenRefresh, let token else {
         throw HTTPError.statusCode(.unauthorized)
       }
       print("Refreshing token")
-      let request = RefreshTokenRequest(refreshToken: refreshToken)
-      let refreshedToken: AuthToken = try await call(host: authHost, endpoint: "/oauth2/v3/token", body: request, token: token, onTokenRefresh: nil)
+      let refreshedToken = try await TeslaTokenRefresher.shared.refresh(token: token)
       onTokenRefresh(refreshedToken)
       return try await call(host: host, endpoint: endpoint, method: method, body: body, token: refreshedToken, onTokenRefresh: nil)
     } catch HTTPError.statusCode(let code) {
@@ -158,4 +159,37 @@ struct RefreshTokenRequest: Encodable {
 
 private struct TeslaResponse<T: Decodable>: Decodable {
   let response: T
+}
+
+private actor TeslaTokenRefresher {
+  static let shared = TeslaTokenRefresher()
+  
+  private var ongoing = [String: Task<AuthToken, Error>]()
+  
+  func refresh(token: AuthToken) async throws -> AuthToken {
+    if let task = ongoing[token.accessToken] {
+      print("Waiting for ongoing refresh")
+      return try await task.value
+    }
+    
+    guard let refreshToken = token.refreshToken else {
+      throw TeslaAPIError.refreshTokenMissing
+    }
+    
+    let task = Task {
+      let request = RefreshTokenRequest(refreshToken: refreshToken)
+      let refreshedToken: AuthToken = try await TeslaAPI.call(host: TeslaAPI.authHost, endpoint: "/oauth2/v3/token", body: request, token: token, onTokenRefresh: nil)
+      return refreshedToken
+    }
+    
+    ongoing[token.accessToken] = task
+    do {
+      let refreshedToken = try await task.value
+      ongoing[token.accessToken] = nil
+      return refreshedToken
+    } catch {
+      ongoing[token.accessToken] = nil
+      throw error
+    }
+  }
 }
