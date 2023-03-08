@@ -1,7 +1,9 @@
 public typealias OnRefreshBlock = (AuthToken) -> Void
 
 public struct TeslaBackendAPI {
-  public init() {}
+  public init(logger: ((String, String?, HTTPStatusCode?) -> Void)? = nil) {
+    TeslaAPI.logger = logger
+  }
 
   public func vehicles(token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> [Vehicle] {
     try await TeslaAPI.call(endpoint: "api/1/vehicles", token: token, onTokenRefresh: onRefresh)

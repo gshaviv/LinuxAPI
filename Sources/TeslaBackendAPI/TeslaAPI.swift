@@ -44,6 +44,8 @@ internal enum TeslaAPI {
     let config = URLSessionConfiguration.default
     return URLSession(configuration: config)
   }()
+  public static var logger: ((String, String?, HTTPStatusCode?) -> Void)?
+
   
   static func call<R: Decodable>(host: String? = nil,
                                  endpoint: IntString...,
@@ -91,19 +93,23 @@ internal enum TeslaAPI {
     do {
       data = try await session.data(for: request)
     } catch HTTPError.statusCode(.unauthorized) {
+      logger?(urlStr, nil, .unauthorized)
       guard let onTokenRefresh, let token else {
         throw HTTPError.statusCode(.unauthorized)
       }
-      print("Refreshing token")
+      logger?("Refreshing token", nil, nil)
       let refreshedToken = try await TeslaTokenRefresher.shared.refresh(token: token)
       onTokenRefresh(refreshedToken)
       return try await call(host: host, endpoint: endpoint, method: method, body: body, token: refreshedToken, onTokenRefresh: nil)
     } catch HTTPError.statusCode(let code) {
+      if let logger {
+        logger(urlStr, nil, code)
+      }
       throw TeslaAPIError.network(code)
     }
     
-    if loggingEnabled, let str = String(data: data, encoding: .utf8) {
-      print("- URL:\n\(urlStr)\n- Response:\n\(str)")
+    if let logger, let str = String(data: data, encoding: .utf8) {
+      logger(urlStr, str, nil)
     }
     
     if host == nil {
