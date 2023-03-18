@@ -10,11 +10,11 @@ import Foundation
 public struct Distance: Codable {
   public var value: Measurement<UnitLength>
   
-  init(kms value: Double = 0) {
+  public init(kms value: Double = 0) {
     self.value = Measurement(value: value, unit: .kilometers)
   }
   
-  init(miles value: Double) {
+  public init(miles value: Double) {
     self.value = Measurement(value: value, unit: .miles)
   }
     
@@ -39,11 +39,11 @@ public struct Distance: Codable {
 public struct Speed: Codable {
   public var value: Measurement<UnitSpeed>
   
-  init(kmh value: Double = 0) {
+  public init(kmh value: Double = 0) {
     self.value = Measurement(value: value, unit: .kilometersPerHour)
   }
   
-  init(mph value: Double) {
+  public init(mph value: Double) {
     self.value = Measurement(value: value, unit: .milesPerHour)
   }
   
@@ -68,11 +68,11 @@ public struct Speed: Codable {
 public struct Pressure: Codable {
   public var value: Measurement<UnitPressure>
   
-  init(psi value: Double = 0) {
+  public init(psi value: Double = 0) {
     self.value = Measurement(value: value, unit: .poundsForcePerSquareInch)
   }
   
-  init(bar value: Double) {
+  public init(bar value: Double) {
     self.value = Measurement(value: value, unit: .bars)
   }
   
