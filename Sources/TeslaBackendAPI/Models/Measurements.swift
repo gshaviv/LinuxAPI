@@ -97,11 +97,11 @@ public struct Pressure: Codable {
 public struct Temperature: Codable {
   public var value: Measurement<UnitTemperature>
   
-  init(celsius value: Double = 0) {
+  public init(celsius value: Double = 0) {
     self.value = Measurement(value: value, unit: .celsius)
   }
   
-  init(fahrenheit value: Double) {
+  public init(fahrenheit value: Double) {
     self.value = Measurement(value: value, unit: .fahrenheit)
   }
   
