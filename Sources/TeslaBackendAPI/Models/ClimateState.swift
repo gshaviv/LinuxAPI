@@ -52,6 +52,24 @@ public struct ClimateState: Codable {
   public let smartPreconditioning: Bool?
 
   public let timeStamp: TimeStamp
+  public enum CabinOverheatProtection: String, Codable {
+    case on = "On"
+    case off = "Off"
+    case fanOnly = "FanOnly"
+    
+    public init(from decoder: Decoder) throws {
+      let container = try decoder.singleValueContainer()
+      let rawValue = try container.decode(String.self)
+      self = CabinOverheatProtection(rawValue: rawValue) ?? .off
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+      var container = encoder.singleValueContainer()
+      try container.encode(self.rawValue)
+    }
+  }
+  public let cabinOverheatProtection: CabinOverheatProtection
+  public let copActivelyCooling: Bool
 
   private enum CodingKeys: String, CodingKey {
     case batteryHeater = "battery_heater"
@@ -85,5 +103,7 @@ public struct ClimateState: Codable {
     case wiperBladeHeater = "wiper_blade_heater"
     case smartPreconditioning = "smart_preconditioning"
     case timeStamp = "timestamp"
+    case cabinOverheatProtection = "cabin_overheat_protection"
+    case copActivelyCooling = "cabin_overheat_protection_actively_cooling"
   }
 }
