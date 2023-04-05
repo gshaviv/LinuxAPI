@@ -42,6 +42,8 @@ internal enum TeslaAPI {
   fileprivate static let authHost = "https://auth.tesla.com"
   private static let session: URLSession = {
     let config = URLSessionConfiguration.default
+    config.httpMaximumConnectionsPerHost = 12
+    config.httpShouldUsePipelining = true
     return URLSession(configuration: config)
   }()
   public static var logger: ((String, String?, HTTPStatusCode?) -> Void)?
