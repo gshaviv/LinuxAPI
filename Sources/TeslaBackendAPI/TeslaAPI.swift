@@ -54,22 +54,22 @@ internal enum TeslaAPI {
                                  method: HTTPMethod? = nil,
                                  token: AuthToken?,
                                  onTokenRefresh: ((AuthToken) -> Void)?) async throws -> R {
-    return try await call(host: host, endpoint: endpoint, method: method, body: Bool?.none, token: token, onTokenRefresh: onTokenRefresh)
+    return try await call(host: host, endpoint: endpoint, method: method, body: false, token: token, onTokenRefresh: onTokenRefresh)
   }
   
-  static func call<B: Encodable, R: Decodable>(host: String? = nil,
+  static func call<R: Decodable>(host: String? = nil,
                                                endpoint: IntString...,
                                                method: HTTPMethod? = nil,
-                                               body: B,
+                                               body: Any,
                                                token: AuthToken?,
                                                onTokenRefresh: ((AuthToken) -> Void)?) async throws -> R {
     return try await call(host: host, endpoint: endpoint, method: method, body: body, token: token, onTokenRefresh: onTokenRefresh)
   }
   
-  static private func call<B: Encodable, R: Decodable>(host: String?,
+  static private func call<R: Decodable>(host: String?,
                                                        endpoint: [IntString],
                                                        method: HTTPMethod?,
-                                                       body: B?,
+                                                       body: Any,
                                                        token: AuthToken?,
                                                        onTokenRefresh: ((AuthToken) -> Void)?) async throws -> R {
     let urlStr = "\(host ?? Self.host)/\(endpoint.map { String(describing: $0) }.map { $0.trimmingCharacters(in: CharacterSet(charactersIn: "/")) }.joined(separator: "/"))"
@@ -79,7 +79,13 @@ internal enum TeslaAPI {
     
     var request = URLRequest(url: url)
     
-    if let body {
+    if body is Bool {
+      // do nothing
+    } else if let body = body as? [String: Any] {
+      request.httpBody = try JSONSerialization.data(withJSONObject: body)
+      request.httpMethod = "POST"
+      request.addValue("application/json", forHTTPHeaderField: "content-type")
+    } else if let body = body as? Encodable {
       request.httpBody = try teslaJSONEncoder.encode(body)
       request.httpMethod = "POST"
       request.addValue("application/json", forHTTPHeaderField: "content-type")
@@ -202,3 +208,5 @@ private actor TeslaTokenRefresher {
     }
   }
 }
+
+

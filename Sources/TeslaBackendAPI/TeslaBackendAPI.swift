@@ -12,7 +12,7 @@ public struct TeslaBackendAPI {
       let r: Vehicle = try await TeslaAPI.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, token: token, onTokenRefresh: onRefresh)
       return CommandResult(response: CommandResult.CommandResponse(result: r.state == .online, reason: r.state == .online ? "" : "failed to wakup"))
     default:
-      return try await TeslaAPI.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, token: token, onTokenRefresh: onRefresh)
+      return try await TeslaAPI.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, body: cmd.postParams, token: token, onTokenRefresh: onRefresh)
     }
   }
 
@@ -75,17 +75,12 @@ public enum TeslaCommand: Codable {
 private extension TeslaCommand {
   var path: String {
     switch self {
-    case .actuateTrunk(whichTrunk: let which):
-      return "command/actuate_trunk?which_trunk=\(which)"
-      
+    case .actuateTrunk:
+      return "command/actuate_trunk"
     case .wake:
       return "wake_up"
-    case .start(password: let password):
-      if let password {
-        return "ommand/remote_start_drive?password=\(password)"
-      } else {
+    case .start:
         return "ommand/remote_start_drive"
-      }
     case .unlock:
       return "command/door_unlock"
     case .lock:
@@ -98,10 +93,10 @@ private extension TeslaCommand {
       return "command/auto_conditioning_start"
     case .stopAC:
       return "command/auto_conditioning_stop"
-    case .setTemprature(driver: let d, passenger: let p):
-      return "command/set_temps?driver_temp=\(d)&passenger_temp=\(p)"
-    case .chargeLimit(percent: let p):
-      return "command/set_charge_limit?percent=\(p)"
+    case .setTemprature:
+      return "command/set_temps"
+    case .chargeLimit:
+      return "command/set_charge_limit"
     case .openChargePort:
       return "command/charge_port_door_open"
     case .closeChargePort:
@@ -110,10 +105,27 @@ private extension TeslaCommand {
       return  "command/charge_start"
     case .stopCharging:
       return "command/charge_stop"
-    case .valet(on: let on, password: let pass) where pass == nil:
-      return "command/set_valet_mode?on=\(on)"
-    case .valet(on: let on, password: let pass):
-      return "command/set_valet_mode?on=\(on)&password=\(pass ?? "")"
+    case .valet:
+      return "command/set_valet_mode"
+    }
+  }
+  
+  var postParams: [String: Any] {
+    switch self {
+    case .valet(on: let on, password: let pwd) where pwd == nil:
+      return ["on": on]
+    case .valet(on: let on, password: let pwd):
+      return ["on": on, "password": pwd ?? ""]
+    case .setTemprature(driver: let d, passenger: let p):
+      return ["driver_temp": d, "passenger_temp": p]
+    case .chargeLimit(percent: let p):
+      return ["percent": p]
+    case .start(password: let password) where password != nil:
+      return ["password": password ?? ""]
+    case .actuateTrunk(whichTrunk: let which):
+      return ["which_trunk": which]
+    default:
+      return [:]
     }
   }
 }
