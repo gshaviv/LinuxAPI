@@ -69,11 +69,15 @@ public enum TeslaCommand: Codable {
   case startCharging
   case stopCharging
   case valet(on: Bool, password: String?)
+  case actuateTrunk(whichTrunk: String)
 }
 
 private extension TeslaCommand {
   var path: String {
     switch self {
+    case .actuateTrunk(whichTrunk: let which):
+      return "command/actuate_trunk?which_trunk=\(which)"
+      
     case .wake:
       return "wake_up"
     case .start(password: let password):
