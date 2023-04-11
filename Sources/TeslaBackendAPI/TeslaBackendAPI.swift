@@ -116,8 +116,8 @@ private extension TeslaCommand {
 
 public struct CommandResult: Codable {
   public struct CommandResponse: Codable {
-    let result: Bool
-    let reason: String
+    public let result: Bool
+    public let reason: String
   }
-  let response: CommandResponse
+  public let response: CommandResponse
 }
