@@ -22,6 +22,10 @@ public struct DriveState: Codable {
   public let gpsDate: Date?
   public let timeStamp: TimeStamp
   public let power: Int?
+  public let activeRouteDestination: String?
+  public let activeRouteEnergyAtArrival: Int?
+  public let activeRouteMilesToArrival: Double?
+  public let activeRouteMinutesToArrival: Double?
 
   private enum CodingKeys: String, CodingKey {
     case shiftState = "shift_state"
@@ -36,5 +40,9 @@ public struct DriveState: Codable {
     case nativeLongitude = "native_longitude"
     case nativeLocationSupportedInt = "native_location_supported"
     case nativeType = "native_type"
+    case activeRouteDestination = "active_route_destination"
+    case activeRouteEnergyAtArrival = "active_route_energy_at_arrival"
+    case activeRouteMilesToArrival = "active_route_miles_to_arrival"
+    case activeRouteMinutesToArrival = "active_route_minutes_to_arrival"
   }
 }
