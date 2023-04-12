@@ -183,7 +183,6 @@ private actor TeslaTokenRefresher {
   
   func refresh(token: AuthToken) async throws -> AuthToken {
     if let task = ongoing[token.accessToken] {
-      print("Waiting for ongoing refresh")
       return try await task.value
     }
     
@@ -194,7 +193,6 @@ private actor TeslaTokenRefresher {
     let task = Task {
       let request = RefreshTokenRequest(refreshToken: refreshToken)
       let refreshedToken: AuthToken = try await TeslaAPI.call(host: TeslaAPI.authHost, endpoint: "/oauth2/v3/token", body: request, token: token, onTokenRefresh: nil)
-      print("Token refreshed")
       return refreshedToken
     }
     

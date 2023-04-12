@@ -84,7 +84,6 @@ extension URLSession {
     guard response.code == .ok else {
       let code = (response as! HTTPURLResponse).statusCode
       let httpCode = HTTPStatusCode(rawValue: code) ?? .unknown
-      print("* HTTP status code = \(code) \(httpCode)")
       throw HTTPError.statusCode(response.code)
     }
     return data

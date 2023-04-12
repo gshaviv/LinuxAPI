@@ -115,7 +115,6 @@ final class TeslaBackendAPITests: XCTestCase {
   func testVehicleState() async {
     do {
       let x = try await api.getVehicleState(id: vehicleID, token: token, onRefresh: onRefresh)
-      print("\(x.frontRightTirePressure?.psi ?? -1)")
       XCTAssert((x.frontRightTirePressure?.psi ?? 0) > 0, "no tire pressure")
       XCTAssertEqual(x.vehicleName, "Tess", "not tess?")
     } catch let e as DecodingError {
