@@ -1,7 +1,12 @@
+import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
+
 public typealias OnRefreshBlock = (AuthToken) -> Void
 
 public struct TeslaBackendAPI {
-  public init(logger: ((String, String?, HTTPStatusCode?) -> Void)? = nil) {
+  public init(logger: ((URLRequest, String?, HTTPStatusCode?) -> Void)? = nil) {
     TeslaAPI.logger = logger
   }
   

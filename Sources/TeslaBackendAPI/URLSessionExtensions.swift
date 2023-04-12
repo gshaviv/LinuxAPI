@@ -124,7 +124,7 @@ public enum HTTPStatusCode: Int {
   case unauthorized = 401
   case paymentRequired = 402
   case forbidden = 403
-  case notFDound = 404
+  case notFound = 404
   case methodNotAllowed = 405
   case notAcceptable = 406
   case proxyAuthenticationRequired = 407
