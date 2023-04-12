@@ -72,11 +72,14 @@ public enum TeslaCommand: Codable {
   case stopCharging
   case valet(on: Bool, password: String?)
   case actuateTrunk(whichTrunk: String)
+  case sentry(on: Bool)
 }
 
 private extension TeslaCommand {
   var path: String {
     switch self {
+    case .sentry:
+      return "command/set_sentry_mode"
     case .actuateTrunk:
       return "command/actuate_trunk"
     case .wake:
@@ -126,6 +129,8 @@ private extension TeslaCommand {
       return ["password": password ?? ""]
     case .actuateTrunk(whichTrunk: let which):
       return ["which_trunk": which]
+    case .sentry(on: let on):
+      return ["on": on]
     default:
       return [:]
     }
