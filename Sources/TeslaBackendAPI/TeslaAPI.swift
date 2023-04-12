@@ -46,7 +46,7 @@ internal enum TeslaAPI {
     config.httpShouldUsePipelining = true
     return URLSession(configuration: config)
   }()
-  public static var logger: ((URLRequest, String?, HTTPStatusCode?) -> Void)?
+  public static var logger: ((String, String, Data?, String?, HTTPStatusCode?) -> Void)?
 
   
   static func call<R: Decodable>(host: String? = nil,
@@ -103,7 +103,7 @@ internal enum TeslaAPI {
     do {
       data = try await session.data(for: request)
     } catch HTTPError.statusCode(.unauthorized) {
-      logger?(request, nil, .unauthorized)
+      logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, nil, .unauthorized)
       guard let onTokenRefresh, let token else {
         throw HTTPError.statusCode(.unauthorized)
       }
@@ -112,13 +112,13 @@ internal enum TeslaAPI {
       return try await call(host: host, endpoint: endpoint, method: method, body: body, token: refreshedToken, onTokenRefresh: nil)
     } catch HTTPError.statusCode(let code) {
       if let logger {
-        logger(request, nil, code)
+        logger(request.httpMethod ?? "GET", urlStr, request.httpBody, nil, code)
       }
       throw TeslaAPIError.network(code)
     }
     
     if let logger, let str = String(data: data, encoding: .utf8) {
-      logger(request, str, nil)
+      logger(request.httpMethod ?? "GET", urlStr, request.httpBody, str, nil)
     }
     
     if host == nil {
