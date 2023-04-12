@@ -8,7 +8,6 @@ public struct TeslaBackendAPI {
   }
   
   public func command(_ cmd: TeslaCommand, id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> CommandResult {
-    
     switch cmd {
     case .wake:
       let r: Vehicle = try await TeslaAPI.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, token: token, onTokenRefresh: onRefresh)
@@ -73,11 +72,14 @@ public enum TeslaCommand: Codable {
   case valet(on: Bool, password: String?)
   case actuateTrunk(whichTrunk: String)
   case sentry(on: Bool)
+  case vent(close: Bool, lat: Double, long: Double)
 }
 
 private extension TeslaCommand {
   var path: String {
     switch self {
+    case .vent:
+      return "command/window_control"
     case .sentry:
       return "command/set_sentry_mode"
     case .actuateTrunk:
@@ -85,7 +87,7 @@ private extension TeslaCommand {
     case .wake:
       return "wake_up"
     case .start:
-        return "ommand/remote_start_drive"
+      return "ommand/remote_start_drive"
     case .unlock:
       return "command/door_unlock"
     case .lock:
@@ -107,7 +109,7 @@ private extension TeslaCommand {
     case .closeChargePort:
       return "command/charge_port_door_close"
     case .startCharging:
-      return  "command/charge_start"
+      return "command/charge_start"
     case .stopCharging:
       return "command/charge_stop"
     case .valet:
@@ -117,6 +119,10 @@ private extension TeslaCommand {
   
   var postParams: [String: Any] {
     switch self {
+    case .vent(close: let close, lat: let lat, long: let long):
+      return ["command": close ? "close" : "vent",
+              "lon": long,
+              "lat": lat]
     case .valet(on: let on, password: let pwd) where pwd == nil:
       return ["on": on]
     case .valet(on: let on, password: let pwd):
@@ -142,5 +148,6 @@ public struct CommandResult: Codable {
     public let result: Bool
     public let reason: String
   }
+
   public let response: CommandResponse
 }
