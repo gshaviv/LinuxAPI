@@ -73,11 +73,20 @@ public enum TeslaCommand: Codable {
   case actuateTrunk(whichTrunk: String)
   case sentry(on: Bool)
   case vent(close: Bool, lat: Double, long: Double)
+  case seatHeater(seat: Int, level: Int)
+  case climateKeeperMode(Int)
+  case cabinOverheatPtoection(ClimateState.CabinOverheatProtection)
 }
 
 private extension TeslaCommand {
   var path: String {
     switch self {
+    case .cabinOverheatPtoection:
+      return "command/set_cabin_overheat_protection"
+    case .climateKeeperMode:
+      return "command/set_climate_keeper_mode"
+    case .seatHeater:
+      return "command/remote_seat_heater_request"
     case .vent:
       return "command/window_control"
     case .sentry:
@@ -119,6 +128,12 @@ private extension TeslaCommand {
   
   var postParams: [String: Any] {
     switch self {
+    case .cabinOverheatPtoection(let value):
+      return ["on": value != .off, "fan_only": value == .fanOnly]
+    case .climateKeeperMode(let value):
+      return ["climate_keeper_mode": value]
+    case .seatHeater(seat: let seat, level: let level):
+      return ["heater": seat, "level": level]
     case .vent(close: let close, lat: let lat, long: let long):
       return ["command": close ? "close" : "vent",
               "lon": long,

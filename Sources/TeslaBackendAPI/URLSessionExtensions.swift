@@ -82,8 +82,6 @@ extension URLSession {
   func data(for urlRequst: URLRequest) async throws -> Data {
     let (data, response) = try await self.data(for: urlRequst)
     guard response.code == .ok else {
-      let code = (response as! HTTPURLResponse).statusCode
-      let httpCode = HTTPStatusCode(rawValue: code) ?? .unknown
       throw HTTPError.statusCode(response.code)
     }
     return data
