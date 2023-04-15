@@ -7,11 +7,11 @@ public struct TeslaBackendAPI {
     TeslaAPI.logger = logger
   }
   
-  public func command(_ cmd: TeslaCommand, id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> CommandResult {
+  public func command(_ cmd: TeslaCommand, id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> CommandResponse {
     switch cmd {
     case .wake:
       let r: Vehicle = try await TeslaAPI.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, token: token, onTokenRefresh: onRefresh)
-      return CommandResult(response: CommandResult.CommandResponse(result: r.state == .online, reason: r.state == .online ? "" : "failed to wakup"))
+      return CommandResponse(result: r.state == .online, reason: r.state == .online ? "" : "failed to wakup")
     default:
       return try await TeslaAPI.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, body: cmd.postParams, token: token, onTokenRefresh: onRefresh)
     }
@@ -158,11 +158,7 @@ private extension TeslaCommand {
   }
 }
 
-public struct CommandResult: Codable {
-  public struct CommandResponse: Codable {
-    public let result: Bool
-    public let reason: String
-  }
-
-  public let response: CommandResponse
+public struct CommandResponse: Codable {
+  public let result: Bool
+  public let reason: String
 }
