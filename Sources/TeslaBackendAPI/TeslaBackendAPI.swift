@@ -76,11 +76,20 @@ public enum TeslaCommand: Codable {
   case seatHeater(seat: Int, level: Int)
   case climateKeeperMode(Int)
   case cabinOverheatPtoection(ClimateState.CabinOverheatProtection)
+  case chargeCurrent(Int)
+  case scheduleCharge(enable: Bool, minutesSinceMidnight: Int)
+  case scheduledDepart(enable: Bool, when: Int, precondition: Bool, preconditionWeekdaysOnly: Bool, offpeak: Bool, offpearWeekdaysOnly: Bool, offpeakEndTime: Int)
 }
 
 private extension TeslaCommand {
   var path: String {
     switch self {
+    case .scheduledDepart:
+      return "command/set_scheduled_departure"
+    case .scheduleCharge:
+      return "command/set_scheduled_charging"
+    case .chargeCurrent:
+      return "command/set_charging_amps"
     case .cabinOverheatPtoection:
       return "command/set_cabin_overheat_protection"
     case .climateKeeperMode:
@@ -128,6 +137,20 @@ private extension TeslaCommand {
   
   var postParams: [String: Any] {
     switch self {
+    case let .scheduledDepart(enable: enable, when: when, precondition: precondition, preconditionWeekdaysOnly: prew, offpeak: offpeak, offpearWeekdaysOnly: offpeakW, offpeakEndTime: offpeakTime):
+      return [
+        "enable": enable,
+        "departure_time": when,
+        "preconditioning_enabled": precondition,
+        "preconditioning_weekdays_only": prew,
+        "off_peak_charging_enabled": offpeak,
+        "off_peak_charging_weekdays_only": offpeakW,
+        "end_off_peak_time": offpeakTime
+      ]
+    case .scheduleCharge(enable: let enable, minutesSinceMidnight: let minutes):
+      return ["enable": enable, "time": minutes]
+    case .chargeCurrent(let current):
+      return ["charging_amps": current]
     case .cabinOverheatPtoection(let value):
       return ["on": value != .off, "fan_only": value == .fanOnly]
     case .climateKeeperMode(let value):
