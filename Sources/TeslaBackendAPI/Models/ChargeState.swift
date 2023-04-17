@@ -7,6 +7,7 @@ public struct ChargeState: Codable {
     case charging = "Charging"
     case disconnected = "Disconnected"
     case stopped = "Stopped"
+    case starting = "Starting"
   }
     
   public enum ScheduledChargingTimes: String, Codable {
