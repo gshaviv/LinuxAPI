@@ -9,6 +9,12 @@ public struct ChargeState: Codable {
     case stopped = "Stopped"
     case starting = "Starting"
   }
+  
+  public enum ScheduleMode: String, Codable {
+    case off = "Off"
+    case depart = "DepartBy"
+    case start = "StartAt"
+  }
     
   public enum ScheduledChargingTimes: String, Codable {
     case allWeek = "all_week"
@@ -103,7 +109,7 @@ public struct ChargeState: Codable {
   public let maxRangeChargeCounter: Int?
 	
   public let notEnoughPowerToHeat: Bool?
-	
+  public let scheduleMode: ScheduleMode?
   public let scheduledChargingPending: Bool?
   public let scheduledChargingStartTime: Date?
   public let scheduledDepartureTime: Date?
@@ -174,5 +180,6 @@ public struct ChargeState: Codable {
     case tripCharging = "trip_charging"
     case usableBatteryLevel = "usable_battery_level"
     case userChargeEnableRequest = "user_charge_enable_request"
+    case scheduleMode = "scheduled_charging_mode"
   }
 }
