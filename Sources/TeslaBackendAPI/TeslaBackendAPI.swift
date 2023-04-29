@@ -7,6 +7,10 @@ public struct TeslaBackendAPI {
     TeslaAPI.logger = logger
   }
   
+  public func releaseNotes(staged: Bool, id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> ReleaseNotes {
+    try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "release_notes?staged=\(staged)", token: token, onTokenRefresh: onRefresh)
+  }
+  
   public func command(_ cmd: TeslaCommand, id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> CommandResponse {
     switch cmd {
     case .wake:
@@ -79,11 +83,17 @@ public enum TeslaCommand: Codable {
   case chargeCurrent(Int)
   case scheduleCharge(enable: Bool, minutesSinceMidnight: Int)
   case scheduledDepart(enable: Bool, when: Int, precondition: Bool, preconditionWeekdaysOnly: Bool, offpeak: Bool, offpearWeekdaysOnly: Bool, offpeakEndTime: Int)
+  case scheduleUpdate(Int)
+  case cancelScheduledUpdate
 }
 
 private extension TeslaCommand {
   var path: String {
     switch self {
+    case .cancelScheduledUpdate:
+      return "command/cancel_software_update"
+    case .scheduleUpdate:
+      return "command/schedule_software_update"
     case .scheduledDepart:
       return "command/set_scheduled_departure"
     case .scheduleCharge:
@@ -137,6 +147,8 @@ private extension TeslaCommand {
   
   var postParams: [String: Any] {
     switch self {
+    case .scheduleUpdate(let sec):
+      return ["offset_sec": sec]
     case let .scheduledDepart(enable: enable, when: when, precondition: precondition, preconditionWeekdaysOnly: prew, offpeak: offpeak, offpearWeekdaysOnly: offpeakW, offpeakEndTime: offpeakTime):
       return [
         "enable": enable,
