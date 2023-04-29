@@ -21,9 +21,9 @@ public struct ReleaseNotes: Codable {
       case imageUrl = "image_url"
     }
   }
-  let releaseNotes: [Note]
-  let deployedVersion: String
-  let stagedVersion: String?
+  public let releaseNotes: [Note]
+  public let deployedVersion: String
+  public let stagedVersion: String?
   private enum CodingKeys: String, CodingKey {
     case releaseNotes = "release_notes"
     case deployedVersion = "deployed_version"
