@@ -9,11 +9,11 @@ import Foundation
 
 public struct ReleaseNotes: Codable {
   public struct Note: Codable {
-    public let title: String
-    public let subtitle: String
-    public let description: String
-    public let imageUrl: String
-    public let customerVersion: String
+    public let title: String?
+    public let subtitle: String?
+    public let description: String?
+    public let imageUrl: String?
+    public let customerVersion: String?
     
     private enum CodingKeys: String, CodingKey {
       case title, subtitle, description
