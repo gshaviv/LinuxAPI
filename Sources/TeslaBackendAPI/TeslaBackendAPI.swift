@@ -1,6 +1,6 @@
 import Foundation
 
-public typealias OnRefreshBlock = (AuthToken) -> Void
+public typealias OnRefreshBlock = (AuthToken) async -> Void
 
 public struct TeslaBackendAPI {
   public init(logger: ((String, String, Data?, String?, HTTPStatusCode?) -> Void)? = nil) {

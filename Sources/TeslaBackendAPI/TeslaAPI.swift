@@ -53,7 +53,7 @@ internal enum TeslaAPI {
                                  endpoint: IntString...,
                                  method: HTTPMethod? = nil,
                                  token: AuthToken?,
-                                 onTokenRefresh: ((AuthToken) -> Void)?) async throws -> R {
+                                 onTokenRefresh: OnRefreshBlock?) async throws -> R {
     return try await call(host: host, endpoint: endpoint, method: method, body: false, token: token, onTokenRefresh: onTokenRefresh)
   }
   
@@ -62,7 +62,7 @@ internal enum TeslaAPI {
                                                method: HTTPMethod? = nil,
                                                body: Any,
                                                token: AuthToken?,
-                                               onTokenRefresh: ((AuthToken) -> Void)?) async throws -> R {
+                                               onTokenRefresh: OnRefreshBlock?) async throws -> R {
     return try await call(host: host, endpoint: endpoint, method: method, body: body, token: token, onTokenRefresh: onTokenRefresh)
   }
   
@@ -71,7 +71,7 @@ internal enum TeslaAPI {
                                                        method: HTTPMethod?,
                                                        body: Any,
                                                        token: AuthToken?,
-                                                       onTokenRefresh: ((AuthToken) -> Void)?) async throws -> R {
+                                                       onTokenRefresh: OnRefreshBlock?) async throws -> R {
     let urlStr = "\(host ?? Self.host)/\(endpoint.map { String(describing: $0) }.map { $0.trimmingCharacters(in: CharacterSet(charactersIn: "/")) }.joined(separator: "/"))"
     guard let url = URL(string: urlStr) else {
       throw TeslaAPIError.badURL
@@ -108,7 +108,7 @@ internal enum TeslaAPI {
         throw HTTPError.statusCode(.unauthorized)
       }
       let refreshedToken = try await TeslaTokenRefresher.shared.refresh(token: token)
-      onTokenRefresh(refreshedToken)
+      await onTokenRefresh(refreshedToken)
       return try await call(host: host, endpoint: endpoint, method: method, body: body, token: refreshedToken, onTokenRefresh: nil)
     } catch HTTPError.statusCode(let code) {
       if let logger {
