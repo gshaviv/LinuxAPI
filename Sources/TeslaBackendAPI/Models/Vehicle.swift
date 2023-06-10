@@ -72,10 +72,10 @@ public class Vehicle: Codable {
   public let backseatTokenUpdatedAt: Date?
   public let calendarEnabled: Bool
   public let color: String?
-  public let displayName: String
+  public let displayName: String?
   public let id: Int64
   public let idS: String?
-  public let inService: Bool
+  public let inService: Bool?
   public let optionCodes: String?
   public let state: State
   public let tokens: [String]?
