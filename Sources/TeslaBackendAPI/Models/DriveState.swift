@@ -11,9 +11,9 @@ public struct DriveState: Codable {
 
   public let shiftState: ShiftState?
   public let speed: Speed?
-  public let latitude: Double
-  public let longitude: Double
-  public let heading: Double
+  public let latitude: Double?
+  public let longitude: Double?
+  public let heading: Double?
   public let nativeLatitude: Double?
   public let nativeLongitude: Double?
   private var nativeLocationSupportedInt: Int?

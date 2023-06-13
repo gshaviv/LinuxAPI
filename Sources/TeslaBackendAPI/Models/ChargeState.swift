@@ -21,15 +21,15 @@ public struct ChargeState: Codable {
     case weekdays
   }
 	
-  public let batteryHeaterOn: Bool
+  public let batteryHeaterOn: Bool?
   /**
    Percentage of the battery
    */
-  public let batteryLevel: Int
+  public let batteryLevel: Int?
   /**
    Rated Miles
    */
-  public let ratedBatteryRange: Distance
+  public let ratedBatteryRange: Distance?
   public let chargeCurrentRequest: Int?
   public let chargeCurrentRequestMax: Int?
   public let chargeEnableRequest: Bool?

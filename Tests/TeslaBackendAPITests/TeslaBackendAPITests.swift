@@ -73,7 +73,7 @@ final class TeslaBackendAPITests: XCTestCase {
   func testChargeState() async {
     do {
       let cs = try await api.getVehicleChargeState(id: vehicleID, token: token, onRefresh: onRefresh)
-      XCTAssert(cs.batteryLevel > 10, "low battery level")
+      XCTAssert(cs.batteryLevel ?? 0 > 10, "low battery level")
     } catch let e as DecodingError {
       XCTFail("Decoding Error: \(e.description)")
     } catch {

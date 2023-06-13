@@ -3,12 +3,12 @@ import Foundation
 
 final public class VehicleStates: Vehicle {
   public let userId: Int64
-  public let chargeState: ChargeState
-  public let climateState: ClimateState
-  public let driveState: DriveState
-  public let guiSettings: GuiSettings
-  public let vehicleConfig: VehicleConfig
-  public let vehicleState: VehicleState
+  public let chargeState: ChargeState?
+  public let climateState: ClimateState?
+  public let driveState: DriveState?
+  public let guiSettings: GuiSettings?
+  public let vehicleConfig: VehicleConfig?
+  public let vehicleState: VehicleState?
   
   private enum CodingKeys: String, CodingKey {
     case userId = "user_id"
