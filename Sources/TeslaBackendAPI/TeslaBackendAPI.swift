@@ -20,6 +20,22 @@ public struct TeslaBackendAPI {
       return try await TeslaAPI.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, body: cmd.postParams, token: token, onTokenRefresh: onRefresh)
     }
   }
+  
+  public struct Me: Decodable {
+    let email: String?
+    let fullName: String?
+    let profileImageUrl: String?
+    
+    private enum CodingKeys: String, CodingKey {
+      case email
+      case fullName = "full_name"
+      case profileImageUrl = "profile_image_url"
+    }
+  }
+  
+  public func me(token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> Me {
+    try await TeslaAPI.call(endpoint: "api/1/users/me", token: token, onTokenRefresh: onRefresh)
+  }
 
   public func vehicles(token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> [Vehicle] {
     try await TeslaAPI.call(endpoint: "api/1/vehicles", token: token, onTokenRefresh: onRefresh)
