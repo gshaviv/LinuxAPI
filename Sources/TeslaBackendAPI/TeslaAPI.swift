@@ -209,6 +209,10 @@ public actor TeslaTokenRefresher {
       throw error
     }
   }
+  
+  public func setRefreshTaskMaker(_ refreshMaker: @escaping (String, AuthToken) -> Task<AuthToken, Error>) {
+    makeRefreshTask = refreshMaker
+  }
 }
 
 
