@@ -165,7 +165,7 @@ private extension TeslaCommand {
     switch self {
     case .scheduleUpdate(let sec):
       return ["offset_sec": sec]
-    case let .scheduledDepart(enable: enable, when: when, precondition: precondition, preconditionWeekdaysOnly: prew, offpeak: offpeak, offpearWeekdaysOnly: offpeakW, offpeakEndTime: offpeakTime):
+    case .scheduledDepart(enable: let enable, when: let when, precondition: let precondition, preconditionWeekdaysOnly: let prew, offpeak: let offpeak, offpearWeekdaysOnly: let offpeakW, offpeakEndTime: let offpeakTime):
       return [
         "enable": enable,
         "departure_time": when,

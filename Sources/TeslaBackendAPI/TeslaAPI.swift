@@ -177,7 +177,7 @@ private struct TeslaResponse<T: Decodable>: Decodable {
 }
 
 public actor TeslaTokenRefresher {
-  static let shared = TeslaTokenRefresher()
+  public static let shared = TeslaTokenRefresher()
   
   private var ongoing = [String: Task<AuthToken, Error>]()
   public var makeRefreshTask: (String, AuthToken) -> Task<AuthToken, Error> = { refreshToken, token  in
