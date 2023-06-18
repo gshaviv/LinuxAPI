@@ -20,7 +20,7 @@ public struct AuthToken: Codable {
   public let refreshToken: String?
   public let idToken: String?
   
-  init(accessToken: String, tokenType: String?, expiresIn: TimeInterval?, refreshToken: String?, idToken: String?) {
+  public init(accessToken: String, tokenType: String?, expiresIn: TimeInterval?, refreshToken: String?, idToken: String?) {
     self.accessToken = accessToken
     self.tokenType = tokenType
     self.expiresIn = expiresIn
