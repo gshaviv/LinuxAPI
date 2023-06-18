@@ -22,9 +22,9 @@ public struct TeslaBackendAPI {
   }
   
   public struct Me: Decodable {
-    let email: String?
-    let fullName: String?
-    let profileImageUrl: String?
+    public let email: String?
+    public let fullName: String?
+    public let profileImageUrl: String?
     
     private enum CodingKeys: String, CodingKey {
       case email
