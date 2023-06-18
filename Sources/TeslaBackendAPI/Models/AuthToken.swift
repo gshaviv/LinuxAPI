@@ -20,6 +20,14 @@ public struct AuthToken: Codable {
   public let refreshToken: String?
   public let idToken: String?
   
+  init(accessToken: String, tokenType: String?, expiresIn: TimeInterval?, refreshToken: String?, idToken: String?) {
+    self.accessToken = accessToken
+    self.tokenType = tokenType
+    self.expiresIn = expiresIn
+    self.refreshToken = refreshToken
+    self.idToken = idToken
+  }
+  
   private enum CodingKeys: String, CodingKey {
     case accessToken = "access_token"
     case tokenType = "token_type"
