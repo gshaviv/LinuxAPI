@@ -176,10 +176,17 @@ private struct TeslaResponse<T: Decodable>: Decodable {
   let response: T
 }
 
-private actor TeslaTokenRefresher {
+public actor TeslaTokenRefresher {
   static let shared = TeslaTokenRefresher()
   
   private var ongoing = [String: Task<AuthToken, Error>]()
+  public var makeRefreshTask: (String, AuthToken) -> Task<AuthToken, Error> = { refreshToken, token  in
+    Task {
+      let request = RefreshTokenRequest(refreshToken: refreshToken)
+      let refreshedToken: AuthToken = try await TeslaAPI.call(host: TeslaAPI.authHost, endpoint: "/oauth2/v3/token", body: request, token: token, onTokenRefresh: nil)
+      return refreshedToken
+    }
+  }
   
   func refresh(token: AuthToken) async throws -> AuthToken {
     if let task = ongoing[token.accessToken] {
@@ -190,11 +197,7 @@ private actor TeslaTokenRefresher {
       throw TeslaAPIError.refreshTokenMissing
     }
     
-    let task = Task {
-      let request = RefreshTokenRequest(refreshToken: refreshToken)
-      let refreshedToken: AuthToken = try await TeslaAPI.call(host: TeslaAPI.authHost, endpoint: "/oauth2/v3/token", body: request, token: token, onTokenRefresh: nil)
-      return refreshedToken
-    }
+    let task = makeRefreshTask(refreshToken, token)
     
     ongoing[token.accessToken] = task
     do {
