@@ -22,24 +22,24 @@ public struct ClimateState: Codable {
   /*
    * Temp directions 0 at least 583...
    */
-  public let leftTemperatureDirection: Int?
-  public let rightTemperatureDirection: Int?
+  public var leftTemperatureDirection: Int?
+  public var rightTemperatureDirection: Int?
 
-  public let driverTemperatureSetting: Temperature?
-  public let passengerTemperatureSetting: Temperature?
+  public var driverTemperatureSetting: Temperature?
+  public var passengerTemperatureSetting: Temperature?
 
   public let maxAvailableTemperature: Temperature?
   public let minAvailableTemperature: Temperature?
 
   public let remoteHeaterControlEnabled: Bool?
 
-  public let seatHeaterLeft: Int?
-  public let seatHeaterRearCenter: Int?
-  public let seatHeaterRearLeft: Int?
-  public let seatHeaterRearLeftBack: Int?
-  public let seatHeaterRearRight: Int?
-  public let seatHeaterRearRightBack: Int?
-  public let seatHeaterRight: Int?
+  public var seatHeaterLeft: Int?
+  public var seatHeaterRearCenter: Int?
+  public var seatHeaterRearLeft: Int?
+  public var seatHeaterRearLeftBack: Int?
+  public var seatHeaterRearRight: Int?
+  public var seatHeaterRearRightBack: Int?
+  public var seatHeaterRight: Int?
 
   public let sideMirrorHeaters: Bool?
   public let steeringWheelHeater: Bool?
