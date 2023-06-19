@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension TeslaBackendAPI {
+extension Tesla {
   public struct VehicleState: Codable {
     public struct MediaState: Codable {
       public let remoteControlEnabled: Bool?

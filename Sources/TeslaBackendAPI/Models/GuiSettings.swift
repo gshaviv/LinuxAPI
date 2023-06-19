@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension TeslaBackendAPI {
+extension Tesla {
   public struct GuiSettings: Codable {
     public let distanceUnits: String?
     public let temperatureUnits: String?

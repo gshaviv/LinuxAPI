@@ -1,80 +1,82 @@
 import Foundation
 
-public typealias OnRefreshBlock = (TeslaBackendAPI.AuthToken) async -> Void
+public typealias OnRefreshBlock = (Tesla.AuthToken) async -> Void
 
-public struct TeslaBackendAPI {
-  public init(logger: ((String, String, Data?, String?, HTTPStatusCode?) -> Void)? = nil) {
-    TeslaAPI.logger = logger
-  }
-  
-  public func releaseNotes(staged: Bool, id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> ReleaseNotes {
-    try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "release_notes?staged=\(staged)", token: token, onTokenRefresh: onRefresh)
-  }
-  
-  public func command(_ cmd: TeslaCommand, id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> CommandResponse {
-    switch cmd {
-    case .wake:
-      let r: Vehicle = try await TeslaAPI.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, token: token, onTokenRefresh: onRefresh)
-      return CommandResponse(result: r.state == .online, reason: r.state == .online ? "" : "failed to wakup")
-    default:
-      return try await TeslaAPI.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, body: cmd.postParams, token: token, onTokenRefresh: onRefresh)
+public enum Tesla {
+  public struct BackendAPI {
+    public init(logger: ((String, String, Data?, String?, HTTPStatusCode?) -> Void)? = nil) {
+      TeslaAPI.logger = logger
     }
-  }
-  
-  public struct Me: Decodable {
-    public let email: String?
-    public let fullName: String?
-    public let profileImageUrl: String?
     
-    private enum CodingKeys: String, CodingKey {
-      case email
-      case fullName = "full_name"
-      case profileImageUrl = "profile_image_url"
+    public func releaseNotes(staged: Bool, id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> ReleaseNotes {
+      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "release_notes?staged=\(staged)", token: token, onTokenRefresh: onRefresh)
     }
-  }
-  
-  public func me(token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> Me {
-    try await TeslaAPI.call(endpoint: "api/1/users/me", token: token, onTokenRefresh: onRefresh)
-  }
-
-  public func vehicles(token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> [Vehicle] {
-    try await TeslaAPI.call(endpoint: "api/1/vehicles", token: token, onTokenRefresh: onRefresh)
-  }
-  
-  public func getVehicle(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> Vehicle {
-    try await TeslaAPI.call(endpoint: "api/1/vehicles", id, token: token, onTokenRefresh: onRefresh)
-  }
-  
-  public func getVehicleChargeState(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> ChargeState {
-    try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "data_request/charge_state", token: token, onTokenRefresh: onRefresh)
-  }
-  
-  public func getVehicleDriveState(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> DriveState {
-    try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "data_request/drive_state", token: token, onTokenRefresh: onRefresh)
-  }
-  
-  public func getVehicleClimateState(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> ClimateState {
-    try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "data_request/climate_state", token: token, onTokenRefresh: onRefresh)
-  }
-  
-  public func getVehicleGuiSettings(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> GuiSettings {
-    try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "data_request/gui_settings", token: token, onTokenRefresh: onRefresh)
-  }
-  
-  public func getVehicleState(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> VehicleState {
-    try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "data_request/vehicle_state", token: token, onTokenRefresh: onRefresh)
-  }
-  
-  public func getVehicleConfig(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> VehicleConfig {
-    try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "data_request/vehicle_config", token: token, onTokenRefresh: onRefresh)
-  }
-  
-  public func getAllVehicleStates(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> VehicleStates {
-    try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "vehicle_data", token: token, onTokenRefresh: onRefresh)
+    
+    public func command(_ cmd: TeslaCommand, id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> CommandResponse {
+      switch cmd {
+      case .wake:
+        let r: Vehicle = try await TeslaAPI.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, token: token, onTokenRefresh: onRefresh)
+        return CommandResponse(result: r.state == .online, reason: r.state == .online ? "" : "failed to wakup")
+      default:
+        return try await TeslaAPI.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, body: cmd.postParams, token: token, onTokenRefresh: onRefresh)
+      }
+    }
+    
+    public struct Me: Decodable {
+      public let email: String?
+      public let fullName: String?
+      public let profileImageUrl: String?
+      
+      private enum CodingKeys: String, CodingKey {
+        case email
+        case fullName = "full_name"
+        case profileImageUrl = "profile_image_url"
+      }
+    }
+    
+    public func me(token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> Me {
+      try await TeslaAPI.call(endpoint: "api/1/users/me", token: token, onTokenRefresh: onRefresh)
+    }
+    
+    public func vehicles(token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> [Vehicle] {
+      try await TeslaAPI.call(endpoint: "api/1/vehicles", token: token, onTokenRefresh: onRefresh)
+    }
+    
+    public func getVehicle(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> Vehicle {
+      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, token: token, onTokenRefresh: onRefresh)
+    }
+    
+    public func getVehicleChargeState(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> ChargeState {
+      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "data_request/charge_state", token: token, onTokenRefresh: onRefresh)
+    }
+    
+    public func getVehicleDriveState(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> DriveState {
+      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "data_request/drive_state", token: token, onTokenRefresh: onRefresh)
+    }
+    
+    public func getVehicleClimateState(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> ClimateState {
+      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "data_request/climate_state", token: token, onTokenRefresh: onRefresh)
+    }
+    
+    public func getVehicleGuiSettings(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> GuiSettings {
+      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "data_request/gui_settings", token: token, onTokenRefresh: onRefresh)
+    }
+    
+    public func getVehicleState(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> VehicleState {
+      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "data_request/vehicle_state", token: token, onTokenRefresh: onRefresh)
+    }
+    
+    public func getVehicleConfig(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> VehicleConfig {
+      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "data_request/vehicle_config", token: token, onTokenRefresh: onRefresh)
+    }
+    
+    public func getAllVehicleStates(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> VehicleStates {
+      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "vehicle_data", token: token, onTokenRefresh: onRefresh)
+    }
   }
 }
 
-extension TeslaBackendAPI {
+extension Tesla.BackendAPI {
   public enum TeslaCommand: Codable {
     case wake
     case start(password: String?)
@@ -96,7 +98,7 @@ extension TeslaBackendAPI {
     case vent(close: Bool, lat: Double, long: Double)
     case seatHeater(seat: Int, level: Int)
     case climateKeeperMode(Int)
-    case cabinOverheatPtoection(ClimateState.CabinOverheatProtection)
+    case cabinOverheatPtoection(Tesla.ClimateState.CabinOverheatProtection)
     case chargeCurrent(Int)
     case scheduleCharge(enable: Bool, minutesSinceMidnight: Int)
     case scheduledDepart(enable: Bool, when: Int, precondition: Bool, preconditionWeekdaysOnly: Bool, offpeak: Bool, offpearWeekdaysOnly: Bool, offpeakEndTime: Int)

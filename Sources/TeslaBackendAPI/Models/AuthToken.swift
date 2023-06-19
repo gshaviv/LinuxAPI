@@ -13,7 +13,7 @@ private let oAuthClientSecret: String = "c7257eb71a564034f9419ee651c7d0e5f7aa6bf
 private let oAuthScope: String = "openid email offline_access"
 private let oAuthRedirectURI: String = "https://auth.tesla.com/void/callback"
 
-extension TeslaBackendAPI {
+extension Tesla {
   public struct AuthToken: Codable {
     public let accessToken: String
     public let tokenType: String?

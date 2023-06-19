@@ -1,7 +1,7 @@
 
 import Foundation
 
-extension TeslaBackendAPI {
+extension Tesla {
   public struct VehicleConfig: Codable {
     public let canAcceptNavigationRequests: Bool?
     public let canActuateTrunks: Bool?

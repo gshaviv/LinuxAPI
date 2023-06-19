@@ -1,7 +1,7 @@
 
 import Foundation
 
-extension TeslaBackendAPI {
+extension Tesla {
   public struct ClimateState: Codable {
     /*
      * Fan speed 0-6 or nil

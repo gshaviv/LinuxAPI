@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension TeslaBackendAPI {
+extension Tesla {
   public struct Distance: Codable {
     public var value: Measurement<UnitLength>
     

@@ -1,7 +1,7 @@
 
 import Foundation
 
-extension TeslaBackendAPI {
+extension Tesla {
   public class Vehicle: Codable {
     public enum State: Codable, Equatable, CustomStringConvertible {
       case online

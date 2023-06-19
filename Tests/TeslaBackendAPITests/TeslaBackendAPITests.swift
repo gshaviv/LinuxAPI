@@ -6,9 +6,9 @@ final class TeslaBackendAPITests: XCTestCase {
   lazy var onRefresh: OnRefreshBlock = {
     self.token = $0
   }
-  var token: TeslaBackendAPI.AuthToken! {
+  var token: Tesla.AuthToken! {
     set {
-      guard let data = try? TeslaBackendAPI.TeslaAPI.teslaJSONEncoder.encode(newValue) else {
+      guard let data = try? Tesla.TeslaAPI.teslaJSONEncoder.encode(newValue) else {
         return
       }
       UserDefaults.standard.set(data, forKey: "token")
@@ -17,10 +17,10 @@ final class TeslaBackendAPITests: XCTestCase {
       guard let data = UserDefaults.standard.data(forKey: "token") else {
         return nil
       }
-      return try? TeslaBackendAPI.TeslaAPI.teslaJSONDecoder.decode(TeslaBackendAPI.AuthToken.self, from: data)
+      return try? Tesla.TeslaAPI.teslaJSONDecoder.decode(Tesla.AuthToken.self, from: data)
     }
   }
-  let api = TeslaBackendAPI()
+  let api = Tesla.BackendAPI()
   var vehicleID: Int64!
   
   override class func setUp() {

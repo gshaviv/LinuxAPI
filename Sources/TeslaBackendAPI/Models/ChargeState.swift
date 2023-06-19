@@ -1,7 +1,7 @@
 
 import Foundation
 
-extension TeslaBackendAPI {
+extension Tesla {
   public struct ChargeState: Codable {
     public enum ChargingState: String, Codable {
       case complete = "Complete"

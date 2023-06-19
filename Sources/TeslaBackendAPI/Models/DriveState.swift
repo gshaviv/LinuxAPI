@@ -1,7 +1,7 @@
 
 import Foundation
 
-extension TeslaBackendAPI {
+extension Tesla {
   public struct DriveState: Codable {
     public enum ShiftState: String, Codable {
       case drive = "D"

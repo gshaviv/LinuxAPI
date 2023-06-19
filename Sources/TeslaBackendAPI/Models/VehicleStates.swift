@@ -1,7 +1,7 @@
 
 import Foundation
 
-extension TeslaBackendAPI {
+extension Tesla {
   final public class VehicleStates: Vehicle {
     public let userId: Int64
     public let chargeState: ChargeState?

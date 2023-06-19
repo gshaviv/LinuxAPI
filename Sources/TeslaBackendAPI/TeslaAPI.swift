@@ -17,7 +17,7 @@ extension String: IntString {}
 extension Int: IntString {}
 extension Int64: IntString {}
 
-extension TeslaBackendAPI {
+extension Tesla {
   public enum TeslaAPIError: Error, LocalizedError {
     case badURL
     case network(HTTPStatusCode)

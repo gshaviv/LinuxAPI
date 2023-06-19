@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension TeslaBackendAPI {
+extension Tesla {
   public struct ReleaseNotes: Codable {
     public struct Note: Codable {
       public let title: String?
