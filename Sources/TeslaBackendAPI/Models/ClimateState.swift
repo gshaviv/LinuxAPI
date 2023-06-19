@@ -5,11 +5,11 @@ public struct ClimateState: Codable {
   /*
    * Fan speed 0-6 or nil
    */
-  public let fanStatus: Int?
+  public var fanStatus: Int?
 
-  public let isAutoConditioningOn: Bool?
-  public let isClimateOn: Bool?
-  public let climateKeeperMode: String?
+  public var isAutoConditioningOn: Bool?
+  public var isClimateOn: Bool?
+  public var climateKeeperMode: String?
 
   public let batteryHeater: Bool?
   public let batteryHeaterNoPower: Bool?
@@ -68,7 +68,7 @@ public struct ClimateState: Codable {
       try container.encode(self.rawValue)
     }
   }
-  public let cabinOverheatProtection: CabinOverheatProtection
+  public var cabinOverheatProtection: CabinOverheatProtection
   public let copActivelyCooling: Bool
 
   private enum CodingKeys: String, CodingKey {
