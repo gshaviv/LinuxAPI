@@ -7,7 +7,8 @@ let package = Package(
     name: "TeslaBackendAPI",
     platforms: [
       .macOS(.v12),
-      .iOS(.v14)
+      .iOS(.v14),
+      .watchOS(.v8)
     ],
     products: [
         .library(
