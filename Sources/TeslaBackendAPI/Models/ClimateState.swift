@@ -106,4 +106,40 @@ public struct ClimateState: Codable {
     case cabinOverheatProtection = "cabin_overheat_protection"
     case copActivelyCooling = "cabin_overheat_protection_actively_cooling"
   }
+  
+  init(fanStatus: Int?, isAutoConditioningOn: Bool?, isClimateOn: Bool?, climateKeeperMode: String?, batteryHeater: Bool?, batteryHeaterNoPower: Bool?, isFrontDefrosterOn: Bool?, isRearDefrosterOn: Bool?, defrostMode: Int?, leftTemperatureDirection: Int? = nil, rightTemperatureDirection: Int? = nil, driverTemperatureSetting: Temperature? = nil, passengerTemperatureSetting: Temperature? = nil, maxAvailableTemperature: Temperature?, minAvailableTemperature: Temperature?, remoteHeaterControlEnabled: Bool?, seatHeaterLeft: Int? = nil, seatHeaterRearCenter: Int? = nil, seatHeaterRearLeft: Int? = nil, seatHeaterRearLeftBack: Int? = nil, seatHeaterRearRight: Int? = nil, seatHeaterRearRightBack: Int? = nil, seatHeaterRight: Int? = nil, sideMirrorHeaters: Bool?, steeringWheelHeater: Bool?, wiperBladeHeater: Bool?, insideTemperature: Temperature?, outsideTemperature: Temperature?, isPreconditioning: Bool?, smartPreconditioning: Bool?, timeStamp: TimeStamp, cabinOverheatProtection: CabinOverheatProtection, copActivelyCooling: Bool) {
+    self.fanStatus = fanStatus
+    self.isAutoConditioningOn = isAutoConditioningOn
+    self.isClimateOn = isClimateOn
+    self.climateKeeperMode = climateKeeperMode
+    self.batteryHeater = batteryHeater
+    self.batteryHeaterNoPower = batteryHeaterNoPower
+    self.isFrontDefrosterOn = isFrontDefrosterOn
+    self.isRearDefrosterOn = isRearDefrosterOn
+    self.defrostMode = defrostMode
+    self.leftTemperatureDirection = leftTemperatureDirection
+    self.rightTemperatureDirection = rightTemperatureDirection
+    self.driverTemperatureSetting = driverTemperatureSetting
+    self.passengerTemperatureSetting = passengerTemperatureSetting
+    self.maxAvailableTemperature = maxAvailableTemperature
+    self.minAvailableTemperature = minAvailableTemperature
+    self.remoteHeaterControlEnabled = remoteHeaterControlEnabled
+    self.seatHeaterLeft = seatHeaterLeft
+    self.seatHeaterRearCenter = seatHeaterRearCenter
+    self.seatHeaterRearLeft = seatHeaterRearLeft
+    self.seatHeaterRearLeftBack = seatHeaterRearLeftBack
+    self.seatHeaterRearRight = seatHeaterRearRight
+    self.seatHeaterRearRightBack = seatHeaterRearRightBack
+    self.seatHeaterRight = seatHeaterRight
+    self.sideMirrorHeaters = sideMirrorHeaters
+    self.steeringWheelHeater = steeringWheelHeater
+    self.wiperBladeHeater = wiperBladeHeater
+    self.insideTemperature = insideTemperature
+    self.outsideTemperature = outsideTemperature
+    self.isPreconditioning = isPreconditioning
+    self.smartPreconditioning = smartPreconditioning
+    self.timeStamp = timeStamp
+    self.cabinOverheatProtection = cabinOverheatProtection
+    self.copActivelyCooling = copActivelyCooling
+  }
 }
