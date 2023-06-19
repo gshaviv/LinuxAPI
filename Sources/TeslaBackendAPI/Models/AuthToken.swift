@@ -13,26 +13,28 @@ private let oAuthClientSecret: String = "c7257eb71a564034f9419ee651c7d0e5f7aa6bf
 private let oAuthScope: String = "openid email offline_access"
 private let oAuthRedirectURI: String = "https://auth.tesla.com/void/callback"
 
-public struct AuthToken: Codable {
-  public let accessToken: String
-  public let tokenType: String?
-  public let expiresIn: TimeInterval?
-  public let refreshToken: String?
-  public let idToken: String?
-  
-  public init(accessToken: String, tokenType: String?, expiresIn: TimeInterval?, refreshToken: String?, idToken: String?) {
-    self.accessToken = accessToken
-    self.tokenType = tokenType
-    self.expiresIn = expiresIn
-    self.refreshToken = refreshToken
-    self.idToken = idToken
-  }
-  
-  private enum CodingKeys: String, CodingKey {
-    case accessToken = "access_token"
-    case tokenType = "token_type"
-    case expiresIn = "expires_in"
-    case refreshToken  = "refresh_token"
-    case idToken = "id_token"
+extension TeslaBackendAPI {
+  public struct AuthToken: Codable {
+    public let accessToken: String
+    public let tokenType: String?
+    public let expiresIn: TimeInterval?
+    public let refreshToken: String?
+    public let idToken: String?
+    
+    public init(accessToken: String, tokenType: String?, expiresIn: TimeInterval?, refreshToken: String?, idToken: String?) {
+      self.accessToken = accessToken
+      self.tokenType = tokenType
+      self.expiresIn = expiresIn
+      self.refreshToken = refreshToken
+      self.idToken = idToken
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+      case accessToken = "access_token"
+      case tokenType = "token_type"
+      case expiresIn = "expires_in"
+      case refreshToken  = "refresh_token"
+      case idToken = "id_token"
+    }
   }
 }

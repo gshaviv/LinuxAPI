@@ -1,6 +1,6 @@
 import Foundation
 
-public typealias OnRefreshBlock = (AuthToken) async -> Void
+public typealias OnRefreshBlock = (TeslaBackendAPI.AuthToken) async -> Void
 
 public struct TeslaBackendAPI {
   public init(logger: ((String, String, Data?, String?, HTTPStatusCode?) -> Void)? = nil) {
@@ -74,142 +74,142 @@ public struct TeslaBackendAPI {
   }
 }
 
-public enum TeslaCommand: Codable {
-  case wake
-  case start(password: String?)
-  case unlock
-  case lock
-  case honk
-  case flash
-  case startAC
-  case stopAC
-  case setTemprature(driver: Double, passenger: Double)
-  case chargeLimit(percent: Int)
-  case openChargePort
-  case closeChargePort
-  case startCharging
-  case stopCharging
-  case valet(on: Bool, password: String?)
-  case actuateTrunk(whichTrunk: String)
-  case sentry(on: Bool)
-  case vent(close: Bool, lat: Double, long: Double)
-  case seatHeater(seat: Int, level: Int)
-  case climateKeeperMode(Int)
-  case cabinOverheatPtoection(ClimateState.CabinOverheatProtection)
-  case chargeCurrent(Int)
-  case scheduleCharge(enable: Bool, minutesSinceMidnight: Int)
-  case scheduledDepart(enable: Bool, when: Int, precondition: Bool, preconditionWeekdaysOnly: Bool, offpeak: Bool, offpearWeekdaysOnly: Bool, offpeakEndTime: Int)
-  case scheduleUpdate(Int)
-  case cancelScheduledUpdate
-}
-
-private extension TeslaCommand {
-  var path: String {
-    switch self {
-    case .cancelScheduledUpdate:
-      return "command/cancel_software_update"
-    case .scheduleUpdate:
-      return "command/schedule_software_update"
-    case .scheduledDepart:
-      return "command/set_scheduled_departure"
-    case .scheduleCharge:
-      return "command/set_scheduled_charging"
-    case .chargeCurrent:
-      return "command/set_charging_amps"
-    case .cabinOverheatPtoection:
-      return "command/set_cabin_overheat_protection"
-    case .climateKeeperMode:
-      return "command/set_climate_keeper_mode"
-    case .seatHeater:
-      return "command/remote_seat_heater_request"
-    case .vent:
-      return "command/window_control"
-    case .sentry:
-      return "command/set_sentry_mode"
-    case .actuateTrunk:
-      return "command/actuate_trunk"
-    case .wake:
-      return "wake_up"
-    case .start:
-      return "ommand/remote_start_drive"
-    case .unlock:
-      return "command/door_unlock"
-    case .lock:
-      return "command/door_lock"
-    case .honk:
-      return "command/honk_horn"
-    case .flash:
-      return "command/flash_lights"
-    case .startAC:
-      return "command/auto_conditioning_start"
-    case .stopAC:
-      return "command/auto_conditioning_stop"
-    case .setTemprature:
-      return "command/set_temps"
-    case .chargeLimit:
-      return "command/set_charge_limit"
-    case .openChargePort:
-      return "command/charge_port_door_open"
-    case .closeChargePort:
-      return "command/charge_port_door_close"
-    case .startCharging:
-      return "command/charge_start"
-    case .stopCharging:
-      return "command/charge_stop"
-    case .valet:
-      return "command/set_valet_mode"
+extension TeslaBackendAPI {
+  public enum TeslaCommand: Codable {
+    case wake
+    case start(password: String?)
+    case unlock
+    case lock
+    case honk
+    case flash
+    case startAC
+    case stopAC
+    case setTemprature(driver: Double, passenger: Double)
+    case chargeLimit(percent: Int)
+    case openChargePort
+    case closeChargePort
+    case startCharging
+    case stopCharging
+    case valet(on: Bool, password: String?)
+    case actuateTrunk(whichTrunk: String)
+    case sentry(on: Bool)
+    case vent(close: Bool, lat: Double, long: Double)
+    case seatHeater(seat: Int, level: Int)
+    case climateKeeperMode(Int)
+    case cabinOverheatPtoection(ClimateState.CabinOverheatProtection)
+    case chargeCurrent(Int)
+    case scheduleCharge(enable: Bool, minutesSinceMidnight: Int)
+    case scheduledDepart(enable: Bool, when: Int, precondition: Bool, preconditionWeekdaysOnly: Bool, offpeak: Bool, offpearWeekdaysOnly: Bool, offpeakEndTime: Int)
+    case scheduleUpdate(Int)
+    case cancelScheduledUpdate
+    
+    var path: String {
+      switch self {
+      case .cancelScheduledUpdate:
+        return "command/cancel_software_update"
+      case .scheduleUpdate:
+        return "command/schedule_software_update"
+      case .scheduledDepart:
+        return "command/set_scheduled_departure"
+      case .scheduleCharge:
+        return "command/set_scheduled_charging"
+      case .chargeCurrent:
+        return "command/set_charging_amps"
+      case .cabinOverheatPtoection:
+        return "command/set_cabin_overheat_protection"
+      case .climateKeeperMode:
+        return "command/set_climate_keeper_mode"
+      case .seatHeater:
+        return "command/remote_seat_heater_request"
+      case .vent:
+        return "command/window_control"
+      case .sentry:
+        return "command/set_sentry_mode"
+      case .actuateTrunk:
+        return "command/actuate_trunk"
+      case .wake:
+        return "wake_up"
+      case .start:
+        return "ommand/remote_start_drive"
+      case .unlock:
+        return "command/door_unlock"
+      case .lock:
+        return "command/door_lock"
+      case .honk:
+        return "command/honk_horn"
+      case .flash:
+        return "command/flash_lights"
+      case .startAC:
+        return "command/auto_conditioning_start"
+      case .stopAC:
+        return "command/auto_conditioning_stop"
+      case .setTemprature:
+        return "command/set_temps"
+      case .chargeLimit:
+        return "command/set_charge_limit"
+      case .openChargePort:
+        return "command/charge_port_door_open"
+      case .closeChargePort:
+        return "command/charge_port_door_close"
+      case .startCharging:
+        return "command/charge_start"
+      case .stopCharging:
+        return "command/charge_stop"
+      case .valet:
+        return "command/set_valet_mode"
+      }
+    }
+    
+    var postParams: [String: Any] {
+      switch self {
+      case .scheduleUpdate(let sec):
+        return ["offset_sec": sec]
+      case .scheduledDepart(enable: let enable, when: let when, precondition: let precondition, preconditionWeekdaysOnly: let prew, offpeak: let offpeak, offpearWeekdaysOnly: let offpeakW, offpeakEndTime: let offpeakTime):
+        return [
+          "enable": enable,
+          "departure_time": when,
+          "preconditioning_enabled": precondition,
+          "preconditioning_weekdays_only": prew,
+          "off_peak_charging_enabled": offpeak,
+          "off_peak_charging_weekdays_only": offpeakW,
+          "end_off_peak_time": offpeakTime
+        ]
+      case .scheduleCharge(enable: let enable, minutesSinceMidnight: let minutes):
+        return ["enable": enable, "time": minutes]
+      case .chargeCurrent(let current):
+        return ["charging_amps": current]
+      case .cabinOverheatPtoection(let value):
+        return ["on": value != .off, "fan_only": value == .fanOnly]
+      case .climateKeeperMode(let value):
+        return ["climate_keeper_mode": value]
+      case .seatHeater(seat: let seat, level: let level):
+        return ["heater": seat, "level": level]
+      case .vent(close: let close, lat: let lat, long: let long):
+        return ["command": close ? "close" : "vent",
+                "lon": long,
+                "lat": lat]
+      case .valet(on: let on, password: let pwd) where pwd == nil:
+        return ["on": on]
+      case .valet(on: let on, password: let pwd):
+        return ["on": on, "password": pwd ?? ""]
+      case .setTemprature(driver: let d, passenger: let p):
+        return ["driver_temp": d, "passenger_temp": p]
+      case .chargeLimit(percent: let p):
+        return ["percent": p]
+      case .start(password: let password) where password != nil:
+        return ["password": password ?? ""]
+      case .actuateTrunk(whichTrunk: let which):
+        return ["which_trunk": which]
+      case .sentry(on: let on):
+        return ["on": on]
+      default:
+        return [:]
+      }
     }
   }
   
-  var postParams: [String: Any] {
-    switch self {
-    case .scheduleUpdate(let sec):
-      return ["offset_sec": sec]
-    case .scheduledDepart(enable: let enable, when: let when, precondition: let precondition, preconditionWeekdaysOnly: let prew, offpeak: let offpeak, offpearWeekdaysOnly: let offpeakW, offpeakEndTime: let offpeakTime):
-      return [
-        "enable": enable,
-        "departure_time": when,
-        "preconditioning_enabled": precondition,
-        "preconditioning_weekdays_only": prew,
-        "off_peak_charging_enabled": offpeak,
-        "off_peak_charging_weekdays_only": offpeakW,
-        "end_off_peak_time": offpeakTime
-      ]
-    case .scheduleCharge(enable: let enable, minutesSinceMidnight: let minutes):
-      return ["enable": enable, "time": minutes]
-    case .chargeCurrent(let current):
-      return ["charging_amps": current]
-    case .cabinOverheatPtoection(let value):
-      return ["on": value != .off, "fan_only": value == .fanOnly]
-    case .climateKeeperMode(let value):
-      return ["climate_keeper_mode": value]
-    case .seatHeater(seat: let seat, level: let level):
-      return ["heater": seat, "level": level]
-    case .vent(close: let close, lat: let lat, long: let long):
-      return ["command": close ? "close" : "vent",
-              "lon": long,
-              "lat": lat]
-    case .valet(on: let on, password: let pwd) where pwd == nil:
-      return ["on": on]
-    case .valet(on: let on, password: let pwd):
-      return ["on": on, "password": pwd ?? ""]
-    case .setTemprature(driver: let d, passenger: let p):
-      return ["driver_temp": d, "passenger_temp": p]
-    case .chargeLimit(percent: let p):
-      return ["percent": p]
-    case .start(password: let password) where password != nil:
-      return ["password": password ?? ""]
-    case .actuateTrunk(whichTrunk: let which):
-      return ["which_trunk": which]
-    case .sentry(on: let on):
-      return ["on": on]
-    default:
-      return [:]
-    }
+  public struct CommandResponse: Codable {
+    public let result: Bool
+    public let reason: String
   }
-}
-
-public struct CommandResponse: Codable {
-  public let result: Bool
-  public let reason: String
 }
