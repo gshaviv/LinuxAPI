@@ -135,6 +135,15 @@ public enum HTTPStatusCode: Int {
   case unsupportedMediaType = 415
   case requestedRangeNotSatisfied = 416
   case expectationFailed = 417
+  case misdirectedRequest = 421
+  case unprocessableEntity = 422
+  case locked = 423
+  case failedDependency = 424
+  case upgradeRequired = 426
+  case preconditionRequired = 428
+  case tooManyRequests = 429
+  case requestHeaderFieldsTooLarge = 431
+  case unavailableForLegalReasons = 451
   case internalServerError = 500
   case notImplemented = 501
   case badGateway = 502
