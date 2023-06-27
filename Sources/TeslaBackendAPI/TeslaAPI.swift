@@ -180,10 +180,15 @@ extension Tesla {
     public static let shared = TeslaTokenRefresher()
     
     private var ongoing = [String: Task<AuthToken, Error>]()
-    public var makeRefreshTask: (String, AuthToken) -> Task<AuthToken, Error> = { refreshToken, token in
+    public var makeRefreshTask: (AuthToken) -> Task<AuthToken, Error> = { token in
       Task {
+        guard let refreshToken = token.refreshToken else {
+          throw TeslaAPIError.refreshTokenMissing
+        }
         let request = RefreshTokenRequest(refreshToken: refreshToken)
+        print("starting token refresh")
         let refreshedToken: AuthToken = try await TeslaAPI.call(host: TeslaAPI.authHost, endpoint: "/oauth2/v3/token", body: request, token: token, onTokenRefresh: nil)
+        print("refreshed token")
         return refreshedToken
       }
     }
@@ -193,11 +198,7 @@ extension Tesla {
         return try await task.value
       }
       
-      guard let refreshToken = token.refreshToken else {
-        throw TeslaAPIError.refreshTokenMissing
-      }
-      
-      let task = makeRefreshTask(refreshToken, token)
+      let task = makeRefreshTask(token)
       
       ongoing[token.accessToken] = task
       do {
@@ -210,7 +211,7 @@ extension Tesla {
       }
     }
     
-    public func setRefreshTaskMaker(_ refreshMaker: @escaping (String, AuthToken) -> Task<AuthToken, Error>) {
+    public func setRefreshTaskMaker(_ refreshMaker: @escaping (AuthToken) -> Task<AuthToken, Error>) {
       makeRefreshTask = refreshMaker
     }
   }
