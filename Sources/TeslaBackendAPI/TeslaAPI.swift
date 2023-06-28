@@ -43,7 +43,6 @@ extension Tesla {
     private static let session: URLSession = {
       let config = URLSessionConfiguration.default
       config.httpMaximumConnectionsPerHost = 12
-      config.httpShouldUsePipelining = true
       return URLSession(configuration: config)
     }()
 
