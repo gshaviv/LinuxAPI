@@ -95,7 +95,7 @@ extension Tesla {
         request.httpMethod = method.rawValue
       }
       
-      if host == nil, let token {
+      if let token {
         request.addValue("Bearer \(token.accessToken)", forHTTPHeaderField: "Authorization")
       }
       request.setValue("TeslaSwift", forHTTPHeaderField: "User-Agent")
