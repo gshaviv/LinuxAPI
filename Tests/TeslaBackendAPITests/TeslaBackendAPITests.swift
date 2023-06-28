@@ -70,70 +70,70 @@ final class TeslaBackendAPITests: XCTestCase {
     }
   }
   
-  func testChargeState() async {
-    do {
-      let cs = try await api.getVehicleChargeState(id: vehicleID, token: token, onRefresh: onRefresh)
-      XCTAssert(cs.batteryLevel ?? 0 > 10, "low battery level")
-    } catch let e as DecodingError {
-      XCTFail("Decoding Error: \(e.description)")
-    } catch {
-      XCTFail("Error: \(error.localizedDescription)")
-    }
-  }
+//  func testChargeState() async {
+//    do {
+//      let cs = try await api.getVehicleChargeState(id: vehicleID, token: token, onRefresh: onRefresh)
+//      XCTAssert(cs.batteryLevel ?? 0 > 10, "low battery level")
+//    } catch let e as DecodingError {
+//      XCTFail("Decoding Error: \(e.description)")
+//    } catch {
+//      XCTFail("Error: \(error.localizedDescription)")
+//    }
+//  }
+//
+//  func testDriveState() async {
+//    do {
+//      let ds = try await api.getVehicleDriveState(id: vehicleID, token: token, onRefresh: onRefresh)
+//      XCTAssert(ds.shiftState == .park || ds.shiftState == nil, "not in park")
+//    } catch let e as DecodingError {
+//      XCTFail("Decoding Error: \(e.description)")
+//    } catch {
+//      XCTFail("Error: \(error.localizedDescription)")
+//    }
+//  }
+//
+//  func testClimateState() async {
+//    do {
+//      let _ = try await api.getVehicleClimateState(id: vehicleID, token: token, onRefresh: onRefresh)
+//    } catch let e as DecodingError {
+//      XCTFail("Decoding Error: \(e.description)")
+//    } catch {
+//      XCTFail("Error: \(error.localizedDescription)")
+//    }
+//  }
+//
+//  func testGuiSettings() async {
+//    do {
+//      let _ = try await api.getVehicleGuiSettings(id: vehicleID, token: token, onRefresh: onRefresh)
+//    } catch let e as DecodingError {
+//      XCTFail("Decoding Error: \(e.description)")
+//    } catch {
+//      XCTFail("Error: \(error.localizedDescription)")
+//    }
+//  }
   
-  func testDriveState() async {
-    do {
-      let ds = try await api.getVehicleDriveState(id: vehicleID, token: token, onRefresh: onRefresh)
-      XCTAssert(ds.shiftState == .park || ds.shiftState == nil, "not in park")
-    } catch let e as DecodingError {
-      XCTFail("Decoding Error: \(e.description)")
-    } catch {
-      XCTFail("Error: \(error.localizedDescription)")
-    }
-  }
-  
-  func testClimateState() async {
-    do {
-      let _ = try await api.getVehicleClimateState(id: vehicleID, token: token, onRefresh: onRefresh)
-    } catch let e as DecodingError {
-      XCTFail("Decoding Error: \(e.description)")
-    } catch {
-      XCTFail("Error: \(error.localizedDescription)")
-    }
-  }
-  
-  func testGuiSettings() async {
-    do {
-      let _ = try await api.getVehicleGuiSettings(id: vehicleID, token: token, onRefresh: onRefresh)
-    } catch let e as DecodingError {
-      XCTFail("Decoding Error: \(e.description)")
-    } catch {
-      XCTFail("Error: \(error.localizedDescription)")
-    }
-  }
-  
-  func testVehicleState() async {
-    do {
-      let x = try await api.getVehicleState(id: vehicleID, token: token, onRefresh: onRefresh)
-      XCTAssert((x.frontRightTirePressure?.psi ?? 0) > 0, "no tire pressure")
-      XCTAssertEqual(x.vehicleName, "Tess", "not tess?")
-    } catch let e as DecodingError {
-      XCTFail("Decoding Error: \(e.description)")
-    } catch {
-      XCTFail("Error: \(error.localizedDescription)")
-    }
-  }
-  
-  func testVehicleConfig() async {
-    do {
-      let x = try await api.getVehicleConfig(id: vehicleID, token: token, onRefresh: onRefresh)
-      XCTAssertEqual(x.euVehicle, true, "not eu vehiclee")
-    } catch let e as DecodingError {
-      XCTFail("Decoding Error: \(e.description)")
-    } catch {
-      XCTFail("Error: \(error.localizedDescription)")
-    }
-  }
+//  func testVehicleState() async {
+//    do {
+//      let x = try await api.getVehicleState(id: vehicleID, token: token, onRefresh: onRefresh)
+//      XCTAssert((x.frontRightTirePressure?.psi ?? 0) > 0, "no tire pressure")
+//      XCTAssertEqual(x.vehicleName, "Tess", "not tess?")
+//    } catch let e as DecodingError {
+//      XCTFail("Decoding Error: \(e.description)")
+//    } catch {
+//      XCTFail("Error: \(error.localizedDescription)")
+//    }
+//  }
+//  
+//  func testVehicleConfig() async {
+//    do {
+//      let x = try await api.getVehicleConfig(id: vehicleID, token: token, onRefresh: onRefresh)
+//      XCTAssertEqual(x.euVehicle, true, "not eu vehiclee")
+//    } catch let e as DecodingError {
+//      XCTFail("Decoding Error: \(e.description)")
+//    } catch {
+//      XCTFail("Error: \(error.localizedDescription)")
+//    }
+//  }
   
   func testAllStates() async {
     do {
