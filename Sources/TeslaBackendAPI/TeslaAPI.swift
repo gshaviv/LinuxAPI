@@ -86,11 +86,11 @@ extension Tesla {
       } else if let body = body as? [String: Any] {
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
         request.httpMethod = "POST"
-        request.addValue("application/json", forHTTPHeaderField: "content-type")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
       } else if let body = body as? Encodable {
         request.httpBody = try teslaJSONEncoder.encode(body)
         request.httpMethod = "POST"
-        request.addValue("application/json", forHTTPHeaderField: "content-type")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
       } else if let method {
         request.httpMethod = method.rawValue
       }
@@ -98,6 +98,7 @@ extension Tesla {
       if host == nil, let token {
         request.addValue("Bearer \(token.accessToken)", forHTTPHeaderField: "Authorization")
       }
+      request.setValue("TeslaSwift", forHTTPHeaderField: "User-Agent")
       
       let data: Data
       do {
