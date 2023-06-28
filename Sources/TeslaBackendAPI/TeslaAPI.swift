@@ -51,7 +51,7 @@ extension Tesla {
     static func call<R: Decodable>(host: String? = nil,
                                    endpoint: IntString...,
                                    method: HTTPMethod? = nil,
-                                   token: () -> AuthToken?,
+                                   token: () async -> AuthToken?,
                                    onTokenRefresh: OnRefreshBlock?) async throws -> R {
       return try await call(host: host, endpoint: endpoint, method: method, body: false, token: token, onTokenRefresh: onTokenRefresh)
     }
@@ -60,7 +60,7 @@ extension Tesla {
                                    endpoint: IntString...,
                                    method: HTTPMethod? = nil,
                                    body: Any,
-                                   token: () -> AuthToken?,
+                                   token: () async -> AuthToken?,
                                    onTokenRefresh: OnRefreshBlock?) async throws -> R {
       return try await call(host: host, endpoint: endpoint, method: method, body: body, token: token, onTokenRefresh: onTokenRefresh)
     }
@@ -69,7 +69,7 @@ extension Tesla {
                                            endpoint: [IntString],
                                            method: HTTPMethod?,
                                            body: Any,
-                                           token tokenFetcher: () -> AuthToken?,
+                                           token tokenFetcher: () async -> AuthToken?,
                                            onTokenRefresh: OnRefreshBlock?) async throws -> R {
       let urlStr = "\(host ?? Self.host)/\(endpoint.map { String(describing: $0) }.map { $0.trimmingCharacters(in: CharacterSet(charactersIn: "/")) }.joined(separator: "/"))"
       guard let url = URL(string: urlStr) else {
@@ -94,7 +94,7 @@ extension Tesla {
         request.httpMethod = method.rawValue
       }
       
-      let token: AuthToken? = host != nil ? nil : tokenFetcher()
+      let token: AuthToken? = await host != nil ? nil : tokenFetcher()
       if let token {
         request.addValue("Bearer \(token.accessToken)", forHTTPHeaderField: "Authorization")
       }
