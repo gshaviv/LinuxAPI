@@ -8,11 +8,11 @@ public enum Tesla {
       TeslaAPI.logger = logger
     }
     
-    public func releaseNotes(staged: Bool, id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> ReleaseNotes {
+    public func releaseNotes(staged: Bool, id: Int64, token: () -> AuthToken?, onRefresh: @escaping OnRefreshBlock) async throws -> ReleaseNotes {
       try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "release_notes?staged=\(staged)", token: token, onTokenRefresh: onRefresh)
     }
     
-    public func command(_ cmd: TeslaCommand, id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> CommandResponse {
+    public func command(_ cmd: TeslaCommand, id: Int64, token: () -> AuthToken?, onRefresh: @escaping OnRefreshBlock) async throws -> CommandResponse {
       switch cmd {
       case .wake:
         let r: Vehicle = try await TeslaAPI.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, token: token, onTokenRefresh: onRefresh)
@@ -34,44 +34,19 @@ public enum Tesla {
       }
     }
     
-    public func me(token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> Me {
+    public func me(token: () -> AuthToken?, onRefresh: @escaping OnRefreshBlock) async throws -> Me {
       try await TeslaAPI.call(endpoint: "api/1/users/me", token: token, onTokenRefresh: onRefresh)
     }
     
-    public func vehicles(token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> [Vehicle] {
+    public func vehicles(token: () -> AuthToken?, onRefresh: @escaping OnRefreshBlock) async throws -> [Vehicle] {
       try await TeslaAPI.call(endpoint: "api/1/vehicles", token: token, onTokenRefresh: onRefresh)
     }
     
-    public func getVehicle(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> Vehicle {
+    public func getVehicle(id: Int64, token: () -> AuthToken?, onRefresh: @escaping OnRefreshBlock) async throws -> Vehicle {
       try await TeslaAPI.call(endpoint: "api/1/vehicles", id, token: token, onTokenRefresh: onRefresh)
     }
     
-    // deprecated endpoints
-//    public func getVehicleChargeState(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> ChargeState {
-//      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "data_request/charge_state", token: token, onTokenRefresh: onRefresh)
-//    }
-//
-//    public func getVehicleDriveState(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> DriveState {
-//      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "data_request/drive_state", token: token, onTokenRefresh: onRefresh)
-//    }
-//
-//    public func getVehicleClimateState(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> ClimateState {
-//      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "data_request/climate_state", token: token, onTokenRefresh: onRefresh)
-//    }
-//
-//    public func getVehicleGuiSettings(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> GuiSettings {
-//      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "data_request/gui_settings", token: token, onTokenRefresh: onRefresh)
-//    }
-//
-//    public func getVehicleState(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> VehicleState {
-//      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "data_request/vehicle_state", token: token, onTokenRefresh: onRefresh)
-//    }
-//
-//    public func getVehicleConfig(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> VehicleConfig {
-//      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "data_request/vehicle_config", token: token, onTokenRefresh: onRefresh)
-//    }
-    
-    public func getAllVehicleStates(id: Int64, token: AuthToken, onRefresh: @escaping OnRefreshBlock) async throws -> VehicleStates {
+    public func getAllVehicleStates(id: Int64, token: () -> AuthToken?, onRefresh: @escaping OnRefreshBlock) async throws -> VehicleStates {
       try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "vehicle_data", token: token, onTokenRefresh: onRefresh)
     }
   }

@@ -51,7 +51,7 @@ extension Tesla {
     static func call<R: Decodable>(host: String? = nil,
                                    endpoint: IntString...,
                                    method: HTTPMethod? = nil,
-                                   token: AuthToken?,
+                                   token: () -> AuthToken?,
                                    onTokenRefresh: OnRefreshBlock?) async throws -> R {
       return try await call(host: host, endpoint: endpoint, method: method, body: false, token: token, onTokenRefresh: onTokenRefresh)
     }
@@ -60,7 +60,7 @@ extension Tesla {
                                    endpoint: IntString...,
                                    method: HTTPMethod? = nil,
                                    body: Any,
-                                   token: AuthToken?,
+                                   token: () -> AuthToken?,
                                    onTokenRefresh: OnRefreshBlock?) async throws -> R {
       return try await call(host: host, endpoint: endpoint, method: method, body: body, token: token, onTokenRefresh: onTokenRefresh)
     }
@@ -69,7 +69,7 @@ extension Tesla {
                                            endpoint: [IntString],
                                            method: HTTPMethod?,
                                            body: Any,
-                                           token: AuthToken?,
+                                           token tokenFetcher: () -> AuthToken?,
                                            onTokenRefresh: OnRefreshBlock?) async throws -> R {
       let urlStr = "\(host ?? Self.host)/\(endpoint.map { String(describing: $0) }.map { $0.trimmingCharacters(in: CharacterSet(charactersIn: "/")) }.joined(separator: "/"))"
       guard let url = URL(string: urlStr) else {
@@ -94,6 +94,7 @@ extension Tesla {
         request.httpMethod = method.rawValue
       }
       
+      let token: AuthToken? = host != nil ? nil : tokenFetcher()
       if let token {
         request.addValue("Bearer \(token.accessToken)", forHTTPHeaderField: "Authorization")
       }
@@ -109,7 +110,7 @@ extension Tesla {
         }
         let refreshedToken = try await TeslaTokenRefresher.shared.refresh(token: token)
         await onTokenRefresh(refreshedToken)
-        return try await call(host: host, endpoint: endpoint, method: method, body: body, token: refreshedToken, onTokenRefresh: nil)
+        return try await call(host: host, endpoint: endpoint, method: method, body: body, token: { refreshedToken }, onTokenRefresh: nil)
       } catch HTTPError.statusCode(let code) {
         if let logger {
           logger(request.httpMethod ?? "GET", urlStr, request.httpBody, nil, code)
@@ -187,7 +188,7 @@ extension Tesla {
         }
         let request = RefreshTokenRequest(refreshToken: refreshToken)
         print("starting token refresh")
-        let refreshedToken: AuthToken = try await TeslaAPI.call(host: TeslaAPI.authHost, endpoint: "/oauth2/v3/token", body: request, token: token, onTokenRefresh: nil)
+        let refreshedToken: AuthToken = try await TeslaAPI.call(host: TeslaAPI.authHost, endpoint: "/oauth2/v3/token", body: request, token: { nil }, onTokenRefresh: nil)
         print("refreshed token")
         return refreshedToken
       }
