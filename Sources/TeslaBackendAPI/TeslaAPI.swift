@@ -187,9 +187,7 @@ extension Tesla {
           throw TeslaAPIError.refreshTokenMissing
         }
         let request = RefreshTokenRequest(refreshToken: refreshToken)
-        print("starting token refresh")
         let refreshedToken: AuthToken = try await TeslaAPI.call(host: TeslaAPI.authHost, endpoint: "/oauth2/v3/token", body: request, token: { nil }, onTokenRefresh: nil)
-        print("refreshed token")
         return refreshedToken
       }
     }
