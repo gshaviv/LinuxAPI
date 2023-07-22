@@ -1,6 +1,6 @@
 import Foundation
 
-public typealias OnRefreshBlock = (Tesla.AuthToken) async -> Void
+public typealias OnRefreshBlock = (Tesla.AuthToken?, Error?) async -> Void
 
 public enum Tesla {
   public struct BackendAPI {

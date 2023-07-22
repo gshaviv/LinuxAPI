@@ -108,8 +108,14 @@ extension Tesla {
         guard let onTokenRefresh, let token else {
           throw HTTPError.statusCode(.unauthorized)
         }
-        let refreshedToken = try await TeslaTokenRefresher.shared.refresh(token: token)
-        await onTokenRefresh(refreshedToken)
+        var refreshedToken: AuthToken
+        do {
+          refreshedToken = try await TeslaTokenRefresher.shared.refresh(token: token)
+          await onTokenRefresh(refreshedToken, nil)
+        } catch {
+          await onTokenRefresh(nil, error)
+          throw error
+        }
         return try await call(host: host, endpoint: endpoint, method: method, body: body, token: { refreshedToken }, onTokenRefresh: nil)
       } catch HTTPError.statusCode(let code) {
         if let logger {

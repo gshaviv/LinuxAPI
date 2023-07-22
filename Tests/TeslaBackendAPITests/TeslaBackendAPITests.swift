@@ -3,8 +3,8 @@ import XCTest
 import Foundation
 
 final class TeslaBackendAPITests: XCTestCase {
-  lazy var onRefresh: OnRefreshBlock = {
-    self.token = $0
+  lazy var onRefresh: OnRefreshBlock = { token, _ in
+    self.token = token
   }
 
   var token: Tesla.AuthToken! {
