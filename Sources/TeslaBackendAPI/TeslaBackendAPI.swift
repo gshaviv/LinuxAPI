@@ -51,8 +51,8 @@ public enum Tesla {
     }
     
     public struct Chargers: Decodable {
-      let superchargers: [ChargingLocation]
-      let destination: [ChargingLocation]
+      public let superchargers: [ChargingLocation]
+      public let destination: [ChargingLocation]
       private enum CodingKeys: String, CodingKey {
         case superchargers
         case destination = "destination_charging"
