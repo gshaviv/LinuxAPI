@@ -49,6 +49,19 @@ public enum Tesla {
     public func getAllVehicleStates(id: Int64, token: () async -> AuthToken?, onRefresh: @escaping OnRefreshBlock) async throws -> VehicleStates {
       try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "vehicle_data", token: token, onTokenRefresh: onRefresh)
     }
+    
+    public struct Chargers: Decodable {
+      let superchargers: [ChargingLocation]
+      let destination: [ChargingLocation]
+      private enum CodingKeys: String, CodingKey {
+        case superchargers
+        case destination = "destination_charging"
+      }
+    }
+    
+    public func chargingLocations(id: Int64, token: () async -> AuthToken?, onRefresh: @escaping OnRefreshBlock) async throws -> Chargers {
+      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "nearby_charging_sites", token: token, onTokenRefresh: onRefresh)
+    }
   }
 }
 
