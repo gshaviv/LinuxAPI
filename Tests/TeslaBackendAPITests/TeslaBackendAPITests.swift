@@ -57,6 +57,18 @@ final class TeslaBackendAPITests: XCTestCase {
     }
   }
   
+  func testChargingLocations() async {
+    do {
+      let _ = try await api.chargingLocations(id: vehicleID, token: { token }, onRefresh: onRefresh)
+    } catch let error as CustomStringConvertible {
+      XCTFail("Error: \(error.description)")
+    } catch let error as LocalizedError {
+      XCTFail("Error: \(error.errorDescription ?? error.localizedDescription)")
+    } catch {
+      XCTFail("Error: \(error.localizedDescription)")
+    }
+  }
+  
   func testVehicle() async {
     do {
       let v = try await api.getVehicle(id: vehicleID, token: { token }, onRefresh: onRefresh)

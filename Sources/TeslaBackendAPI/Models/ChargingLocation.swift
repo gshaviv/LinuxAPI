@@ -48,5 +48,15 @@ extension Tesla {
       self.totalStalls = try container.decodeIfPresent(Int.self, forKey: .totalStalls)
       self.isClosed = try container.decodeIfPresent(Bool.self, forKey: .isClosed)
     }
+    
+    public init(location: (longitude: Double, latitude: Double), name: String, type: ChargerType, distance: Double, availabledStalls: Int? = nil, totalStalls: Int? = nil, isClosed: Bool? = nil) {
+      self.location = location
+      self.name = name
+      self.distance = Distance(miles: distance)
+      self.type = type
+      self.availableStalls = availabledStalls
+      self.totalStalls = totalStalls
+      self.isClosed = isClosed
+    }
   }
 }
