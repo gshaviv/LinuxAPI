@@ -16,7 +16,7 @@ public enum Tesla {
       switch cmd {
       case .wake:
         let r: Vehicle = try await TeslaAPI.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, token: token, onTokenRefresh: onRefresh)
-        return CommandResponse(result: r.state == .online, reason: r.state == .online ? "" : "failed to wakup")
+        return CommandResponse(result: r.state == .online, reason: r.state == .online ? "" : "failed to wakup", queued: nil)
       default:
         return try await TeslaAPI.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, body: cmd.postParams, token: token, onTokenRefresh: onRefresh)
       }
@@ -213,6 +213,7 @@ extension Tesla.BackendAPI {
   
   public struct CommandResponse: Codable {
     public let result: Bool
-    public let reason: String
+    public let reason: String?
+    public let queued: Bool?
   }
 }
