@@ -38,6 +38,18 @@ public enum Tesla {
       try await TeslaAPI.call(endpoint: "api/1/users/me", token: token, onTokenRefresh: onRefresh)
     }
     
+    public func share(location: String, id: Int64, token: () async -> AuthToken?, onRefresh: @escaping OnRefreshBlock) async throws -> CommandResponse {
+      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "command/share",
+                              body: ["type": "share_ext_content_raw",
+                                     "locale": "en-US",
+                                     "timestamp_ms": Int(Date().timeIntervalSince1970 * 1000),
+                                     "value": [
+                                      "android.intent.extra.TEXT": location
+                                     ]],
+                              token: token,
+                              onTokenRefresh: onRefresh)
+    }
+    
     public func vehicles(token: () async -> AuthToken?, onRefresh: @escaping OnRefreshBlock) async throws -> [Vehicle] {
       try await TeslaAPI.call(endpoint: "api/1/vehicles", token: token, onTokenRefresh: onRefresh)
     }
