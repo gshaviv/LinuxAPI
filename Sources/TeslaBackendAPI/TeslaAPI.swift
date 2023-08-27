@@ -43,7 +43,7 @@ extension Tesla {
     private static let session: URLSession = {
       let config = URLSessionConfiguration.default
       config.httpMaximumConnectionsPerHost = 12
-      config.timeoutIntervalForResource = 8
+      config.timeoutIntervalForResource = 15
       return URLSession(configuration: config)
     }()
 
