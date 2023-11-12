@@ -24,24 +24,24 @@ extension Tesla {
     public required init(from decoder: Decoder) throws {
       let container = try decoder.container(keyedBy: CodingKeys.self)
       userId = try container.decode(Int64.self, forKey: .userId)
-      chargeState = try container.decode(ChargeState.self, forKey: .chargeState)
-      climateState = try container.decode(ClimateState.self, forKey: .climateState)
-      driveState = try container.decode(DriveState.self, forKey: .driveState)
-      guiSettings = try container.decode(GuiSettings.self, forKey: .guiSettings)
-      vehicleState = try container.decode(VehicleState.self, forKey: .vehicleState)
-      vehicleConfig = try container.decode(VehicleConfig.self, forKey: .vehicleConfig)
+      chargeState = try container.decodeIfPresent(ChargeState.self, forKey: .chargeState)
+      climateState = try container.decodeIfPresent(ClimateState.self, forKey: .climateState)
+      driveState = try container.decodeIfPresent(DriveState.self, forKey: .driveState)
+      guiSettings = try container.decodeIfPresent(GuiSettings.self, forKey: .guiSettings)
+      vehicleState = try container.decodeIfPresent(VehicleState.self, forKey: .vehicleState)
+      vehicleConfig = try container.decodeIfPresent(VehicleConfig.self, forKey: .vehicleConfig)
       try super.init(from: decoder)
     }
     
     override public func encode(to encoder: Encoder) throws {
       var container = encoder.container(keyedBy: CodingKeys.self)
       try container.encode(userId, forKey: .userId)
-      try container.encode(chargeState, forKey: .chargeState)
-      try container.encode(climateState, forKey: .climateState)
-      try container.encode(driveState, forKey: .driveState)
-      try container.encode(guiSettings, forKey: .guiSettings)
-      try container.encode(vehicleConfig, forKey: .vehicleConfig)
-      try container.encode(vehicleState, forKey: .vehicleState)
+      try container.encodeIfPresent(chargeState, forKey: .chargeState)
+      try container.encodeIfPresent(climateState, forKey: .climateState)
+      try container.encodeIfPresent(driveState, forKey: .driveState)
+      try container.encodeIfPresent(guiSettings, forKey: .guiSettings)
+      try container.encodeIfPresent(vehicleConfig, forKey: .vehicleConfig)
+      try container.encodeIfPresent(vehicleState, forKey: .vehicleState)
       try super.encode(to: container.superEncoder())
     }
   }
