@@ -58,8 +58,8 @@ public enum Tesla {
       try await TeslaAPI.call(endpoint: "api/1/vehicles", id, token: token, onTokenRefresh: onRefresh)
     }
     
-    public func getAllVehicleStates(id: Int64, token: () async -> AuthToken?, onRefresh: @escaping OnRefreshBlock) async throws -> VehicleStates {
-      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "vehicle_data", token: token, onTokenRefresh: onRefresh)
+    public func getVehicleData(id: Int64, data: [DataEndpoint] = DataEndpoint.all, token: () async -> AuthToken?, onRefresh: @escaping OnRefreshBlock) async throws -> VehicleStates {
+      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "vehicle_data?endpoints=\(data.map { $0.rawValue }.joined(separator: ";"))", token: token, onTokenRefresh: onRefresh)
     }
     
     public struct Chargers: Decodable {
