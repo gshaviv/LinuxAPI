@@ -14,7 +14,10 @@ public enum DataEndpoint: String {
   case vehicleState = "vehicle_state"
   case guiSettings = "gui_settings"
   case vehicleConfig = "vehicle_config"
+  case driveState = "drive_state"
+  case closuresState = "closures_state"
+//  case combo = "vehicle_data_combo"
   
-  public static var all: [DataEndpoint] = [.location, .chargeState, .climateState, .vehicleState, .guiSettings, .vehicleConfig]
-  public static var allWithoutLocation: [DataEndpoint] = [.chargeState, .climateState, .vehicleState, .guiSettings, .vehicleConfig]
+  public static var all: [DataEndpoint] = [.location, .chargeState, .climateState, .vehicleState, .guiSettings, .vehicleConfig, .driveState, .closuresState]
+  public static var allWithoutLocation: [DataEndpoint] = [.chargeState, .climateState, .vehicleState, .guiSettings, .vehicleConfig, .driveState, .closuresState]
 }
