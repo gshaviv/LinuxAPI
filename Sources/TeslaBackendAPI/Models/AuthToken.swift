@@ -23,12 +23,11 @@ extension Tesla {
     public enum Region: Codable {
       case northAmerica
       case europe
-      case ownerAPI
       static let middleEast = Region.europe
       static let africa = Region.europe
       static let asiaPacific = Region.northAmerica
     }
-    public var region: Region = .ownerAPI
+    public var region: Region?
     
     public init(accessToken: String, tokenType: String?, expiresIn: TimeInterval?, refreshToken: String?, idToken: String?, region: Region) {
       self.accessToken = accessToken
