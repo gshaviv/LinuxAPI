@@ -20,13 +20,23 @@ extension Tesla {
     public let expiresIn: TimeInterval?
     public let refreshToken: String?
     public let idToken: String?
+    public enum Region: Codable {
+      case northAmerica
+      case europe
+      case ownerAPI
+      static let middleEast = Region.europe
+      static let africa = Region.europe
+      static let asiaPacific = Region.northAmerica
+    }
+    public var region: Region = .ownerAPI
     
-    public init(accessToken: String, tokenType: String?, expiresIn: TimeInterval?, refreshToken: String?, idToken: String?) {
+    public init(accessToken: String, tokenType: String?, expiresIn: TimeInterval?, refreshToken: String?, idToken: String?, region: Region) {
       self.accessToken = accessToken
       self.tokenType = tokenType
       self.expiresIn = expiresIn
       self.refreshToken = refreshToken
       self.idToken = idToken
+      self.region = region
     }
     
     private enum CodingKeys: String, CodingKey {
