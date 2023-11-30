@@ -20,9 +20,9 @@ extension Tesla {
     public let expiresIn: TimeInterval?
     public let refreshToken: String?
     public let idToken: String?
-    public enum Region: Codable {
-      case northAmerica
-      case europe
+    public enum Region: String, Codable {
+      case northAmerica = "na"
+      case europe = "eu"
       static let middleEast = Region.europe
       static let africa = Region.europe
       static let asiaPacific = Region.northAmerica
