@@ -62,6 +62,20 @@ public enum Tesla {
       try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "vehicle_data?endpoints=\(data.map { $0.rawValue }.joined(separator: "%3B"))", token: token, onTokenRefresh: onRefresh)
     }
     
+    public struct RegionResult: Decodable {
+      let region: String
+      let baseURL: String
+      
+      enum CodingKeys: String, CodingKey {
+        case region
+        case baseURL = "fleet_api_base_url"
+      }
+    }
+    
+    public func region(token: () async -> AuthToken?, onRefresh: @escaping OnRefreshBlock) async throws -> RegionResult {
+      try await TeslaAPI.call(endpoint: "api/1/users/region", token: token, onTokenRefresh: onRefresh)
+    }
+    
     public struct Chargers: Decodable {
       public let superchargers: [ChargingLocation]
       public let destination: [ChargingLocation]
