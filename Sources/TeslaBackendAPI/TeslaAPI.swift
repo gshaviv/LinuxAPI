@@ -22,12 +22,14 @@ extension Tesla {
     case badURL
     case network(HTTPStatusCode)
     case refreshTokenMissing
+    case message(String)
     
     public var errorDescription: String? {
       switch self {
       case .badURL: return "bad URL"
       case .network(let code): return "network status: \(code)"
       case .refreshTokenMissing: return "Refresh token missing"
+      case .message(let string): return string
       }
     }
   }
@@ -37,8 +39,18 @@ extension Tesla {
     case post = "POST"
   }
   
-  internal enum TeslaAPI {
-    private static let host = "https://owner-api.teslamotors.com"
+  enum TeslaAPI {
+    enum APIRegion: Hashable {
+      case northAmeria
+      case europe
+      case noRegion
+    }
+
+    private static let host: [APIRegion: String] = [
+      .noRegion: "https://owner-api.teslamotors.com",
+      .northAmeria: "https://fleet-api.prd.na.vn.cloud.tesla.com",
+      .europe: "https://fleet-api.prd.eu.vn.cloud.tesla.com",
+    ]
     fileprivate static let authHost = "https://auth.tesla.com"
     private static let session: URLSession = {
       let config = URLSessionConfiguration.default
@@ -53,8 +65,9 @@ extension Tesla {
                                    endpoint: IntString...,
                                    method: HTTPMethod? = nil,
                                    token: () async -> AuthToken?,
-                                   onTokenRefresh: OnRefreshBlock?) async throws -> R {
-      return try await call(host: host, endpoint: endpoint, method: method, body: false, token: token, onTokenRefresh: onTokenRefresh)
+                                   onTokenRefresh: OnRefreshBlock?) async throws -> R
+    {
+      try await call(host: host, endpoint: endpoint, method: method, body: false, token: token, onTokenRefresh: onTokenRefresh)
     }
     
     static func call<R: Decodable>(host: String? = nil,
@@ -62,17 +75,42 @@ extension Tesla {
                                    method: HTTPMethod? = nil,
                                    body: Any,
                                    token: () async -> AuthToken?,
-                                   onTokenRefresh: OnRefreshBlock?) async throws -> R {
-      return try await call(host: host, endpoint: endpoint, method: method, body: body, token: token, onTokenRefresh: onTokenRefresh)
+                                   onTokenRefresh: OnRefreshBlock?) async throws -> R
+    {
+      try await call(host: host, endpoint: endpoint, method: method, body: body, token: token, onTokenRefresh: onTokenRefresh)
     }
     
-    static private func call<R: Decodable>(host: String?,
+    private static func call<R: Decodable>(host: String?,
                                            endpoint: [IntString],
                                            method: HTTPMethod?,
                                            body: Any,
                                            token tokenFetcher: () async -> AuthToken?,
-                                           onTokenRefresh: OnRefreshBlock?) async throws -> R {
-      let urlStr = "\(host ?? Self.host)/\(endpoint.map { String(describing: $0) }.map { $0.trimmingCharacters(in: CharacterSet(charactersIn: "/")) }.joined(separator: "/"))"
+                                           onTokenRefresh: OnRefreshBlock?) async throws -> R
+    {
+      let callRoot: String
+      let token: AuthToken?
+      if let host {
+        callRoot = host
+        token = nil
+      } else {
+        let fetchedToken = await tokenFetcher()
+        token = fetchedToken
+        let region: APIRegion
+        switch fetchedToken?.region {
+        case .none:
+          region = .noRegion
+        case .northAmerica:
+          region = .northAmeria
+        case .europe:
+          region = .europe
+        }
+        guard let host = Self.host[region] else {
+          throw TeslaAPIError.message("missing host")
+        }
+        callRoot = host
+      }
+      
+      let urlStr = "\(callRoot)/\(endpoint.map { String(describing: $0) }.map { $0.trimmingCharacters(in: CharacterSet(charactersIn: "/")) }.joined(separator: "/"))"
       guard let url = URL(string: urlStr) else {
         throw TeslaAPIError.badURL
       }
@@ -95,7 +133,6 @@ extension Tesla {
         request.httpMethod = method.rawValue
       }
       
-      let token: AuthToken? = await host != nil ? nil : tokenFetcher()
       if let token {
         request.addValue("Bearer \(token.accessToken)", forHTTPHeaderField: "Authorization")
       }
@@ -137,14 +174,14 @@ extension Tesla {
       }
     }
     
-    internal static let teslaJSONEncoder: JSONEncoder = {
+    static let teslaJSONEncoder: JSONEncoder = {
       let encoder = JSONEncoder()
       encoder.outputFormatting = .prettyPrinted
       encoder.dateEncodingStrategy = .secondsSince1970
       return encoder
     }()
     
-    internal static let teslaJSONDecoder: JSONDecoder = {
+    static let teslaJSONDecoder: JSONDecoder = {
       let decoder = JSONDecoder()
       decoder.dateDecodingStrategy = .custom { decoder -> Date in
         let container = try decoder.singleValueContainer()
@@ -154,7 +191,7 @@ extension Tesla {
           let dateString = try container.decode(String.self)
           let dateFormatter = ISO8601DateFormatter()
           var date = dateFormatter.date(from: dateString)
-          guard let date = date else {
+          guard let date else {
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "Cannot decode date string \(dateString)")
           }
           return date
@@ -166,10 +203,31 @@ extension Tesla {
   
   struct RefreshTokenRequest: Encodable {
     var refreshToken: String
-    private(set) var grantType = "refresh_token"
-    private(set) var clientID = "ownerapi"
-    private(set) var clientSecret = "c7257eb71a564034f9419ee651c7d0e5f7aa6bfbd18bafb5c5c033b093bb2fa3"
-    private(set) var scope = "openid email offline_access"
+    
+    static let credentials: [(clientID: String, clientSecret: String, scope: String)] = [
+      (clientID: "ownerapi",
+       clientSecret: "c7257eb71a564034f9419ee651c7d0e5f7aa6bfbd18bafb5c5c033b093bb2fa3",
+       scope: "openid email offline_access"),
+      (clientID: "81aa009288f7-4dac-8d69-97fcc04fa737",
+       clientSecret: "ta-secret.*AciQd9Q2Db&+yG*",
+       scope: "openid user_data vehicle_device_data offline_access vehicle_cmds vehicle_charging_cmds"),
+    ]
+    static let ownerAPI = 0
+    static let fleetAPI = 1
+    let kind: Int
+    let grantType = "refresh_token"
+
+    var clientID: String {
+      Self.credentials[kind].clientID
+    }
+
+    var clientSecret: String {
+      Self.credentials[kind].clientSecret
+    }
+
+    var scope: String {
+      Self.credentials[kind].scope
+    }
     
     private enum CodingKeys: String, CodingKey {
       case refreshToken = "refresh_token"
@@ -177,6 +235,15 @@ extension Tesla {
       case clientID = "client_id"
       case clientSecret = "client_secret"
       case scope
+    }
+    
+    func encode(to encoder: Encoder) throws {
+      var container = encoder.container(keyedBy: CodingKeys.self)
+      try container.encode(scope, forKey: .scope)
+      try container.encode(clientID, forKey: .clientID)
+      try container.encode(clientSecret, forKey: .clientSecret)
+      try container.encode(refreshToken, forKey: .refreshToken)
+      try container.encode(grantType, forKey: .grantType)
     }
   }
   
@@ -193,7 +260,7 @@ extension Tesla {
         guard let refreshToken = token.refreshToken else {
           throw TeslaAPIError.refreshTokenMissing
         }
-        let request = RefreshTokenRequest(refreshToken: refreshToken)
+        let request = RefreshTokenRequest(refreshToken: refreshToken, kind: token.region == nil ? RefreshTokenRequest.ownerAPI : RefreshTokenRequest.fleetAPI)
         let refreshedToken: AuthToken = try await TeslaAPI.call(host: TeslaAPI.authHost, endpoint: "/oauth2/v3/token", body: request, token: { nil }, onTokenRefresh: nil)
         return refreshedToken
       }
