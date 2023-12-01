@@ -261,7 +261,8 @@ extension Tesla {
           throw TeslaAPIError.refreshTokenMissing
         }
         let request = RefreshTokenRequest(refreshToken: refreshToken, kind: token.region == nil ? RefreshTokenRequest.ownerAPI : RefreshTokenRequest.fleetAPI)
-        let refreshedToken: AuthToken = try await TeslaAPI.call(host: TeslaAPI.authHost, endpoint: "/oauth2/v3/token", body: request, token: { nil }, onTokenRefresh: nil)
+        var refreshedToken: AuthToken = try await TeslaAPI.call(host: TeslaAPI.authHost, endpoint: "/oauth2/v3/token", body: request, token: { nil }, onTokenRefresh: nil)
+        refreshedToken.region = token.region
         return refreshedToken
       }
     }
