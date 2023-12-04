@@ -44,6 +44,7 @@ extension Tesla {
       case expiresIn = "expires_in"
       case refreshToken  = "refresh_token"
       case idToken = "id_token"
+      case region
     }
   }
 }
