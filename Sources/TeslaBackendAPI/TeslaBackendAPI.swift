@@ -246,10 +246,10 @@ public extension Tesla.BackendAPI {
 
 public extension Tesla {
   struct Alert: Codable {
-    let name: String
-    let message: String
-    let dateString: String
-    let audience: [String]
+    public let name: String
+    public let message: String
+    public let dateString: String
+    public let audience: [String]
     private enum CodingKeys: String, CodingKey {
       case name
       case message = "user_text"
