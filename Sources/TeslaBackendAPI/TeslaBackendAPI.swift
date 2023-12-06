@@ -49,7 +49,7 @@ public enum Tesla {
                                      "locale": "en-US",
                                      "timestamp_ms": Int(Date().timeIntervalSince1970 * 1000),
                                      "value": [
-                                      "android.intent.extra.TEXT": location
+                                       "android.intent.extra.TEXT": location
                                      ]],
                               token: token,
                               onTokenRefresh: onRefresh)
@@ -64,7 +64,7 @@ public enum Tesla {
     }
     
     public func getVehicleData(id: Int64, data: [DataEndpoint] = DataEndpoint.all, token: () async -> AuthToken?, onRefresh: @escaping OnRefreshBlock) async throws -> VehicleStates {
-      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "vehicle_data?endpoints=\(data.map { $0.rawValue }.joined(separator: "%3B"))", token: token, onTokenRefresh: onRefresh)
+      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "vehicle_data?endpoints=\(data.map(\.rawValue).joined(separator: "%3B"))", token: token, onTokenRefresh: onRefresh)
     }
     
     public struct RegionResult: Decodable {
@@ -96,8 +96,8 @@ public enum Tesla {
   }
 }
 
-extension Tesla.BackendAPI {
-  public enum TeslaCommand: Codable {
+public extension Tesla.BackendAPI {
+  enum TeslaCommand: Codable {
     case wake
     case start(password: String?)
     case unlock
@@ -230,13 +230,22 @@ extension Tesla.BackendAPI {
     }
   }
   
-  public struct CommandResponse: Codable {
+  struct CommandResponse: Codable {
     public let result: Bool
     public let reason: String?
     public let queued: Bool?
   }
   
-  public struct Alert: Codable {
+  internal struct RecentAlerts: Codable {
+    let recentAlerts: [Tesla.Alert]
+    private enum CodingKeys: String, CodingKey {
+      case recentAlerts = "recent_alerts"
+    }
+  }
+}
+
+public extension Tesla {
+  struct Alert: Codable {
     let name: String
     let message: String
     let dateString: String
@@ -246,13 +255,6 @@ extension Tesla.BackendAPI {
       case message = "user_text"
       case dateString = "time"
       case audience
-    }
-  }
-  
-  struct RecentAlerts: Codable {
-    let recentAlerts: [Alert]
-    private enum CodingKeys: String, CodingKey {
-      case recentAlerts = "recent_alerts"
     }
   }
 }
