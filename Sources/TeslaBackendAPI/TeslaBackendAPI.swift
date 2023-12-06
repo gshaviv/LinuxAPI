@@ -38,6 +38,11 @@ public enum Tesla {
       try await TeslaAPI.call(endpoint: "api/1/users/me", token: token, onTokenRefresh: onRefresh)
     }
     
+    public func recentAlerts(id: Int64, token: () async -> AuthToken?, onRefresh: @escaping OnRefreshBlock) async throws -> [Alert] {
+      let recent: RecentAlerts = try await TeslaAPI.call(endpoint: "/api/1/vehicles", id, "recent_alerts", token: token, onTokenRefresh: onRefresh)
+      return recent.recentAlerts
+    }
+    
     public func share(location: String, id: Int64, token: () async -> AuthToken?, onRefresh: @escaping OnRefreshBlock) async throws -> CommandResponse {
       try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "command/share",
                               body: ["type": "share_ext_content_raw",
@@ -229,5 +234,25 @@ extension Tesla.BackendAPI {
     public let result: Bool
     public let reason: String?
     public let queued: Bool?
+  }
+  
+  public struct Alert: Codable {
+    let name: String
+    let message: String
+    let dateString: String
+    let audience: [String]
+    private enum CodingKeys: String, CodingKey {
+      case name
+      case message = "user_text"
+      case dateString = "time"
+      case audience
+    }
+  }
+  
+  struct RecentAlerts: Codable {
+    let recentAlerts: [Alert]
+    private enum CodingKeys: String, CodingKey {
+      case recentAlerts = "recent_alerts"
+    }
   }
 }
