@@ -56,6 +56,7 @@ extension Tesla {
       let config = URLSessionConfiguration.default
       config.httpMaximumConnectionsPerHost = 12
       config.timeoutIntervalForResource = 15
+      config.urlCache = nil
       return URLSession(configuration: config)
     }()
 
