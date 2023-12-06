@@ -233,15 +233,15 @@ extension Tesla {
       case refreshToken = "refresh_token"
       case grantType = "grant_type"
       case clientID = "client_id"
-      case clientSecret = "client_secret"
-      case scope
+//      case clientSecret = "client_secret"
+//      case scope
     }
     
     func encode(to encoder: Encoder) throws {
       var container = encoder.container(keyedBy: CodingKeys.self)
-      try container.encode(scope, forKey: .scope)
+//      try container.encode(scope, forKey: .scope)
       try container.encode(clientID, forKey: .clientID)
-      try container.encode(clientSecret, forKey: .clientSecret)
+//      try container.encode(clientSecret, forKey: .clientSecret)
       try container.encode(refreshToken, forKey: .refreshToken)
       try container.encode(grantType, forKey: .grantType)
     }
