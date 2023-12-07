@@ -268,7 +268,7 @@ extension Tesla {
       }
     }
     
-    func refresh(token: AuthToken) async throws -> AuthToken {
+    public func refresh(token: AuthToken) async throws -> AuthToken {
       if let task = ongoing[token.accessToken] {
         return try await task.value
       }
