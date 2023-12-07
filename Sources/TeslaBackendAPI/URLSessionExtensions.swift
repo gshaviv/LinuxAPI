@@ -153,3 +153,127 @@ public enum HTTPStatusCode: Int {
   case vehicleServerError = 540
   case unknown
 }
+
+extension HTTPStatusCode: CustomStringConvertible {
+  public var stringValue: String {
+    switch self {
+    case .continue:
+      return "continue"
+    case .switchingProtocols:
+      return "Switching Protocols"
+    case .ok:
+      return "ok"
+    case .created:
+      return "created"
+    case .accepted:
+      return "Accepted"
+    case .nonAuthorative:
+      return "Non Authorative"
+    case .noContent:
+      return "No Content"
+    case .resetContent:
+      return "Reset Content"
+    case .partialContent:
+      return "Partial Content"
+    case .multipleChoices:
+      return "Multiple Choises"
+    case .moved:
+      return "Moved"
+    case .found:
+      return "Found"
+    case .seeOther:
+      return "See Other"
+    case .notModified:
+      return "Not Modified"
+    case .useProxy:
+      return "Use Proxy"
+    case .temporaryRedirect:
+      return "Temporary Redirect"
+    case .badRequest:
+      return "Bad Gateway"
+    case .unauthorized:
+      return "Unauthorized"
+    case .paymentRequired:
+      return "Payment Required"
+    case .forbidden:
+      return "Forbidden"
+    case .notFound:
+      return "Not Found"
+    case .methodNotAllowed:
+      return "Method not allowed"
+    case .notAcceptable:
+      return "Not Acceptable"
+    case .proxyAuthenticationRequired:
+      return "Proxy Authentication Required"
+    case .timeout:
+      return "Timeout"
+    case .conflict:
+      return "Conflict"
+    case .gone:
+      return "Gone"
+    case .lengthRequired:
+      return "Length Required"
+    case .preconditionFailed:
+      return "Precondition Failed"
+    case .entityTooLarge:
+      return "Entity too large"
+    case .uriTooLarge:
+      return "URI too large"
+    case .unsupportedMediaType:
+      return "Unsupported media type"
+    case .requestedRangeNotSatisfied:
+      return "Requested Range not satisfied"
+    case .expectationFailed:
+      return "Expectation failed"
+    case .misdirectedRequest:
+      return "Misdirected request"
+    case .unprocessableEntity:
+      return "Unprocessable entity"
+    case .locked:
+      return "locked"
+    case .failedDependency:
+      return "Failed dependency"
+    case .upgradeRequired:
+      return "Upgrade required"
+    case .preconditionRequired:
+      return "Preconditin required"
+    case .tooManyRequests:
+      return "Too many resources"
+    case .requestHeaderFieldsTooLarge:
+      return "request header field too large"
+    case .unavailableForLegalReasons:
+      return "unavailable for legal reasons"
+    case .internalServerError:
+      return "internal server error"
+    case .notImplemented:
+      return "Not implemented"
+    case .badGateway:
+      return "Bad Gateway"
+    case .serviceUnavailable:
+      return "Server unavailable"
+    case .gatewayTimeout:
+      return "Gateway timeout"
+    case .httpVersionNotSupported:
+      return "http version not supported"
+    case .vehicleServerError:
+      return "Vehicle server error"
+    case .unknown:
+      return "unknown"
+    }
+  }
+  
+  public var description: String {
+    return "Status \(rawValue): \(stringValue)"
+  }
+}
+
+
+extension HTTPError: LocalizedError {
+  public var errorDescription: String? {
+    if case let .statusCode(code) = self {
+      return code.description
+    } else {
+      return nil
+    }
+  }
+}
