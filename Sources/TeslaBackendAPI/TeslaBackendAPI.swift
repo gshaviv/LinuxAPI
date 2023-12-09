@@ -68,8 +68,8 @@ public enum Tesla {
     }
     
     public struct RegionResult: Decodable {
-      let region: String
-      let baseURL: String
+      public let region: String
+      public let baseURL: String
       
       enum CodingKeys: String, CodingKey {
         case region
