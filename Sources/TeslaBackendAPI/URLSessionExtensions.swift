@@ -190,7 +190,7 @@ extension HTTPStatusCode: CustomStringConvertible {
     case .temporaryRedirect:
       return "Temporary Redirect"
     case .badRequest:
-      return "Bad Gateway"
+      return "Bad Request"
     case .unauthorized:
       return "Unauthorized"
     case .paymentRequired:
