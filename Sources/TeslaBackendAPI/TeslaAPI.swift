@@ -284,7 +284,7 @@ extension Tesla {
       try container.encode(clientID, forKey: .clientID)
       try container.encode(clientSecret, forKey: .clientSecret)
       try container.encode(grantType, forKey: .grantType)
-      try container.encode(audience, forKey: .audience)
+      try container.encode("*", forKey: .audience)
       try container.encode("\(audience)/redirect", forKey: .redirect)
     }
   }
