@@ -332,7 +332,7 @@ extension Tesla {
     }
   }
   
-  static func exchange(code: String) async throws -> AuthToken {
+  public static func exchange(code: String) async throws -> AuthToken {
     let request = GenerateTokenRequest(code: code, kind: RefreshTokenRequest.fleetAPI)
     return try await TeslaAPI.call(host: TeslaAPI.authHost, endpoint: TeslaAPI.authEndpoint, body: request, token: { nil }, onTokenRefresh: nil)
   }
