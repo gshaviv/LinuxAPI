@@ -52,6 +52,7 @@ extension Tesla {
       .europe: "https://fleet-api.prd.eu.vn.cloud.tesla.com",
     ]
     fileprivate static let authHost = "https://auth.tesla.com"
+    fileprivate static let authEndpoint = "/oauth2/v3/token"
     private static let session: URLSession = {
       let config = URLSessionConfiguration.default
       config.httpMaximumConnectionsPerHost = 12
@@ -248,6 +249,46 @@ extension Tesla {
     }
   }
   
+  struct GenerateTokenRequest: Encodable {
+    let code: String
+    let kind: Int
+    let grantType = "authorization_code"
+    let audience = "https://myt-server.fly.dev"
+
+    var clientID: String {
+      RefreshTokenRequest.credentials[kind].clientID
+    }
+
+    var clientSecret: String {
+      RefreshTokenRequest.credentials[kind].clientSecret
+    }
+
+    var scope: String {
+      RefreshTokenRequest.credentials[kind].scope
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+      case grantType = "grant_type"
+      case clientID = "client_id"
+      case clientSecret = "client_secret"
+      case scope
+      case code
+      case audience
+      case redirect = "redirect_uri"
+    }
+    
+    func encode(to encoder: Encoder) throws {
+      var container = encoder.container(keyedBy: CodingKeys.self)
+      try container.encode(code, forKey: .code)
+      try container.encode(scope, forKey: .scope)
+      try container.encode(clientID, forKey: .clientID)
+      try container.encode(clientSecret, forKey: .clientSecret)
+      try container.encode(grantType, forKey: .grantType)
+      try container.encode(audience, forKey: .audience)
+      try container.encode("\(audience)/redirect", forKey: .redirect)
+    }
+  }
+  
   private struct TeslaResponse<T: Decodable>: Decodable {
     let response: T
   }
@@ -262,7 +303,7 @@ extension Tesla {
           throw TeslaAPIError.refreshTokenMissing
         }
         let request = RefreshTokenRequest(refreshToken: refreshToken, kind: token.region == nil ? RefreshTokenRequest.ownerAPI : RefreshTokenRequest.fleetAPI)
-        var refreshedToken: AuthToken = try await TeslaAPI.call(host: TeslaAPI.authHost, endpoint: "/oauth2/v3/token", body: request, token: { token }, onTokenRefresh: nil)
+        var refreshedToken: AuthToken = try await TeslaAPI.call(host: TeslaAPI.authHost, endpoint: TeslaAPI.authEndpoint, body: request, token: { token }, onTokenRefresh: nil)
         refreshedToken.region = token.region
         return refreshedToken
       }
@@ -289,5 +330,10 @@ extension Tesla {
     public func setRefreshTaskMaker(_ refreshMaker: @escaping (AuthToken) -> Task<AuthToken, Error>) {
       makeRefreshTask = refreshMaker
     }
+  }
+  
+  static func exchange(code: String) async throws -> AuthToken {
+    let request = GenerateTokenRequest(code: code, kind: RefreshTokenRequest.fleetAPI)
+    return try await TeslaAPI.call(host: TeslaAPI.authHost, endpoint: TeslaAPI.authEndpoint, body: request, token: { nil }, onTokenRefresh: nil)
   }
 }
