@@ -253,7 +253,8 @@ extension Tesla {
     let code: String
     let kind: Int
     let grantType = "authorization_code"
-    let audience = "https://myt-server.fly.dev"
+    let audience = "https://fleet-api.prd.na.vn.cloud.tesla.com"
+    let redirect = "https://myt-server.fly.dev.oauth/redirect"
 
     var clientID: String {
       RefreshTokenRequest.credentials[kind].clientID
@@ -284,8 +285,8 @@ extension Tesla {
       try container.encode(clientID, forKey: .clientID)
       try container.encode(clientSecret, forKey: .clientSecret)
       try container.encode(grantType, forKey: .grantType)
-      try container.encode("*", forKey: .audience)
-      try container.encode("\(audience)/redirect", forKey: .redirect)
+      try container.encode(audience, forKey: .audience)
+      try container.encode(redirect, forKey: .redirect)
     }
   }
   
