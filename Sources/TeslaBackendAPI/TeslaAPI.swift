@@ -143,6 +143,9 @@ extension Tesla {
       let data: Data
       do {
         data = try await session.data(for: request)
+        if let logger, let str = String(data: data, encoding: .utf8) {
+          logger(request.httpMethod ?? "GET", urlStr, request.httpBody, str, nil)
+        }
       } catch HTTPError.statusCode(.unauthorized) {
         logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, nil, .unauthorized)
         guard let onTokenRefresh, let token else {
@@ -162,10 +165,6 @@ extension Tesla {
           logger(request.httpMethod ?? "GET", urlStr, request.httpBody, nil, code)
         }
         throw TeslaAPIError.network(code)
-      }
-      
-      if let logger, let str = String(data: data, encoding: .utf8) {
-        logger(request.httpMethod ?? "GET", urlStr, request.httpBody, str, nil)
       }
       
       if host == nil {
@@ -272,7 +271,6 @@ extension Tesla {
       case grantType = "grant_type"
       case clientID = "client_id"
       case clientSecret = "client_secret"
-      case scope
       case code
       case audience
       case redirect = "redirect_uri"
@@ -281,7 +279,6 @@ extension Tesla {
     func encode(to encoder: Encoder) throws {
       var container = encoder.container(keyedBy: CodingKeys.self)
       try container.encode(code, forKey: .code)
-      try container.encode(scope, forKey: .scope)
       try container.encode(clientID, forKey: .clientID)
       try container.encode(clientSecret, forKey: .clientSecret)
       try container.encode(grantType, forKey: .grantType)
