@@ -20,6 +20,7 @@ extension Tesla {
     public let expiresIn: TimeInterval?
     public let refreshToken: String?
     public let idToken: String?
+    public var createdAt: TimeInterval?
     public enum Region: String, Codable {
       case northAmerica = "na"
       case europe = "eu"
@@ -45,6 +46,19 @@ extension Tesla {
       case refreshToken  = "refresh_token"
       case idToken = "id_token"
       case region
+      case createdAt = "created_at"
+    }
+    
+    var expirationDate: Date? {
+      if let createdAt, let expiresIn {
+        return Date(timeIntervalSince1970: createdAt + expiresIn)
+      } else {
+        return nil
+      }
+    }
+    
+    mutating func createdNow() {
+      createdAt = Date().timeIntervalSince1970
     }
   }
 }
