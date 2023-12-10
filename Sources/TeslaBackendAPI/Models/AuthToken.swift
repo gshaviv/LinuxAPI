@@ -49,7 +49,7 @@ extension Tesla {
       case createdAt = "created_at"
     }
     
-    var expirationDate: Date? {
+    public var expirationDate: Date? {
       if let createdAt, let expiresIn {
         return Date(timeIntervalSince1970: createdAt + expiresIn)
       } else {
@@ -57,7 +57,7 @@ extension Tesla {
       }
     }
     
-    mutating func createdNow() {
+    public mutating func createdNow() {
       createdAt = Date().timeIntervalSince1970
     }
   }
