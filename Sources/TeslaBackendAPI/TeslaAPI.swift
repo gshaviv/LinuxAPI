@@ -292,37 +292,38 @@ extension Tesla {
     public static let shared = TeslaTokenRefresher()
     
     private var ongoing = [String: Task<AuthToken, Error>]()
-    public var makeRefreshTask: (AuthToken) -> Task<AuthToken, Error> = { token in
+    public var makeRefreshTask: (String?, AuthToken.Region?) -> Task<AuthToken, Error> = { refreshToken, region in
       Task {
-        guard let refreshToken = token.refreshToken else {
+        guard let refreshToken else {
           throw TeslaAPIError.refreshTokenMissing
         }
-        let request = RefreshTokenRequest(refreshToken: refreshToken, kind: token.region == nil ? RefreshTokenRequest.ownerAPI : RefreshTokenRequest.fleetAPI)
-        var refreshedToken: AuthToken = try await TeslaAPI.call(host: TeslaAPI.authHost, endpoint: TeslaAPI.authEndpoint, body: request, token: { token }, onTokenRefresh: nil)
-        refreshedToken.region = token.region
+        let request = RefreshTokenRequest(refreshToken: refreshToken, kind: region == nil ? RefreshTokenRequest.ownerAPI : RefreshTokenRequest.fleetAPI)
+        var refreshedToken: AuthToken = try await TeslaAPI.call(host: TeslaAPI.authHost, endpoint: TeslaAPI.authEndpoint, body: request, token: { nil }, onTokenRefresh: nil)
+        refreshedToken.region = region
+        refreshedToken.createdNow()
         return refreshedToken
       }
     }
     
-    public func refresh(token: AuthToken) async throws -> AuthToken {
-      if let task = ongoing[token.accessToken] {
+    public func refresh(token: AuthToken, refreshToken: String? = nil) async throws -> AuthToken {
+      let key = refreshToken ?? token.refreshToken ?? ""
+      if let task = ongoing[key] {
         return try await task.value
       }
+      let task = makeRefreshTask(refreshToken ?? token.refreshToken, token.region)
       
-      let task = makeRefreshTask(token)
-      
-      ongoing[token.accessToken] = task
+      ongoing[key] = task
       do {
         let refreshedToken = try await task.value
-        ongoing[token.accessToken] = nil
+        ongoing[key] = nil
         return refreshedToken
       } catch {
-        ongoing[token.accessToken] = nil
+        ongoing[key] = nil
         throw error
       }
     }
     
-    public func setRefreshTaskMaker(_ refreshMaker: @escaping (AuthToken) -> Task<AuthToken, Error>) {
+    public func setRefreshTaskMaker(_ refreshMaker: @escaping (String?, AuthToken.Region?) -> Task<AuthToken, Error>) {
       makeRefreshTask = refreshMaker
     }
   }
