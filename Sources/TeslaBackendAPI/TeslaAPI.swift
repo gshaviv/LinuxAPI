@@ -67,7 +67,7 @@ extension Tesla {
                                    endpoint: IntString...,
                                    method: HTTPMethod? = nil,
                                    token: () async -> AuthToken?,
-                                   onTokenRefresh: OnRefreshBlock?) async throws -> R
+                                   onTokenRefresh: RefreshBlock?) async throws -> R
     {
       try await call(host: host, endpoint: endpoint, method: method, body: false, token: token, onTokenRefresh: onTokenRefresh)
     }
@@ -77,7 +77,7 @@ extension Tesla {
                                    method: HTTPMethod? = nil,
                                    body: Any,
                                    token: () async -> AuthToken?,
-                                   onTokenRefresh: OnRefreshBlock?) async throws -> R
+                                   onTokenRefresh: RefreshBlock?) async throws -> R
     {
       try await call(host: host, endpoint: endpoint, method: method, body: body, token: token, onTokenRefresh: onTokenRefresh)
     }
@@ -87,7 +87,7 @@ extension Tesla {
                                            method: HTTPMethod?,
                                            body: Any,
                                            token tokenFetcher: () async -> AuthToken?,
-                                           onTokenRefresh: OnRefreshBlock?) async throws -> R
+                                           onTokenRefresh: RefreshBlock?) async throws -> R
     {
       let callRoot: String
       let token: AuthToken?
@@ -148,18 +148,15 @@ extension Tesla {
         }
       } catch HTTPError.statusCode(.unauthorized) {
         logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, nil, .unauthorized)
-        guard let onTokenRefresh, let token else {
+        guard let onTokenRefresh else {
           throw HTTPError.statusCode(.unauthorized)
         }
-        var refreshedToken: AuthToken
-        do {
-          refreshedToken = try await TeslaTokenRefresher.shared.refresh(token: token)
-          await onTokenRefresh(refreshedToken, nil)
-        } catch {
-          await onTokenRefresh(nil, error)
-          throw error
+        if try await onTokenRefresh() {
+          return try await call(host: host, endpoint: endpoint, method: method, body: body, token: tokenFetcher, onTokenRefresh: nil)
+        } else {
+          throw HTTPError.statusCode(.unauthorized)
         }
-        return try await call(host: host, endpoint: endpoint, method: method, body: body, token: { refreshedToken }, onTokenRefresh: nil)
+        
       } catch HTTPError.statusCode(let code) {
         if let logger {
           logger(request.httpMethod ?? "GET", urlStr, request.httpBody, nil, code)

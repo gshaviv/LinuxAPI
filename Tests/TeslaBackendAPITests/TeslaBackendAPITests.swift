@@ -45,7 +45,7 @@ final class TeslaBackendAPITests: XCTestCase {
   
   func testVehicles() async throws {
     do {
-      let v = try await api.vehicles(token: { token }, onRefresh: onRefresh)
+      let v = try await api.vehicles(token: { token }, refresh: { false })
       XCTAssert(v.count == 1, "expected one vehicle")
       let vid = v.first?.id
       XCTAssertNotNil(vid, "expected ID for first vehicle")
@@ -59,7 +59,7 @@ final class TeslaBackendAPITests: XCTestCase {
   
   func testChargingLocations() async {
     do {
-      let _ = try await api.chargingLocations(id: vehicleID, token: { token }, onRefresh: onRefresh)
+      let _ = try await api.chargingLocations(id: vehicleID, token: { token }, refresh: { false })
     } catch let error as CustomStringConvertible {
       XCTFail("Error: \(error.description)")
     } catch let error as LocalizedError {
@@ -71,7 +71,7 @@ final class TeslaBackendAPITests: XCTestCase {
   
   func testVehicle() async {
     do {
-      let v = try await api.getVehicle(id: vehicleID, token: { token }, onRefresh: onRefresh)
+      let v = try await api.getVehicle(id: vehicleID, token: { token }, refresh: { false })
       XCTAssert(v.displayName == "Tess", "Vehicle name mismatch")
       XCTAssertEqual(v.vin, "LRW3E7FA5MC306961", "vin mismatch")
       XCTAssert(v.inService == false, "expected inService false")
@@ -85,7 +85,7 @@ final class TeslaBackendAPITests: XCTestCase {
   
   func testAllStates() async {
     do {
-      let a = try await api.getVehicleData(id: vehicleID, token: { token }, onRefresh: onRefresh)
+      let a = try await api.getVehicleData(id: vehicleID, token: { token }, refresh: { false })
       XCTAssertNotNil(a.driveState, "nil drive state")
       XCTAssertNotNil(a.climateState, "nil climate state")
       XCTAssertNotNil(a.chargeState, "nil chargeState")
