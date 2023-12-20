@@ -329,8 +329,8 @@ extension Tesla {
     }
   }
   
-  public static func exchange(code: String, audience: API.Region) async throws -> AuthToken {
-    let request = GenerateTokenRequest(code: code, kind: RefreshTokenRequest.fleetAPI, audience: audience.host)
+  public static func exchange(code: String) async throws -> AuthToken {
+    let request = GenerateTokenRequest(code: code, kind: RefreshTokenRequest.fleetAPI, audience: [API.Region.northAmeria, API.Region.europe].map { $0.host }.joined(separator: "%20"))
     return try await API.call(host: API.authHost, endpoint: API.authEndpoint, body: request, token: { nil }, onTokenRefresh: nil)
   }
 }
