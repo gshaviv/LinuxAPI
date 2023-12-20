@@ -39,18 +39,21 @@ extension Tesla {
     case post = "POST"
   }
   
-  enum TeslaAPI {
-    enum APIRegion: Hashable {
+ public  enum API {
+    public enum Region: Hashable {
       case northAmeria
       case europe
       case noRegion
+      
+      public var host: String {
+        switch self {
+        case .noRegion: return "https://owner-api.teslamotors.com"
+        case .northAmeria: return "https://fleet-api.prd.na.vn.cloud.tesla.com"
+        case .europe: return "https://fleet-api.prd.eu.vn.cloud.tesla.com"
+        }
+      }
     }
 
-    private static let host: [APIRegion: String] = [
-      .noRegion: "https://owner-api.teslamotors.com",
-      .northAmeria: "https://fleet-api.prd.na.vn.cloud.tesla.com",
-      .europe: "https://fleet-api.prd.eu.vn.cloud.tesla.com",
-    ]
     fileprivate static let authHost = "https://auth.tesla.com"
     fileprivate static let authEndpoint = "/oauth2/v3/token"
     private static let session: URLSession = {
@@ -97,7 +100,7 @@ extension Tesla {
       } else {
         let fetchedToken = await tokenFetcher()
         token = fetchedToken
-        let region: APIRegion
+        let region: Region
         switch fetchedToken?.region {
         case .none:
           region = .noRegion
@@ -106,9 +109,7 @@ extension Tesla {
         case .europe:
           region = .europe
         }
-        guard let host = Self.host[region] else {
-          throw TeslaAPIError.message("missing host")
-        }
+        let host = region.host
         callRoot = host
       }
       
@@ -249,7 +250,7 @@ extension Tesla {
     let code: String
     let kind: Int
     let grantType = "authorization_code"
-    let audience = "https://myt-server.fly.dev"
+    let audience: String
     let redirect = "https://myt-server.fly.dev/oauth/redirect"
 
     var clientID: String {
@@ -298,7 +299,7 @@ extension Tesla {
           throw TeslaAPIError.refreshTokenMissing
         }
         let request = RefreshTokenRequest(refreshToken: refreshToken, kind: region == nil ? RefreshTokenRequest.ownerAPI : RefreshTokenRequest.fleetAPI)
-        var refreshedToken: AuthToken = try await TeslaAPI.call(host: TeslaAPI.authHost, endpoint: TeslaAPI.authEndpoint, body: request, token: { nil }, onTokenRefresh: nil)
+        var refreshedToken: AuthToken = try await API.call(host: API.authHost, endpoint: API.authEndpoint, body: request, token: { nil }, onTokenRefresh: nil)
         refreshedToken.region = region
         refreshedToken.createdNow()
         return refreshedToken
@@ -328,8 +329,8 @@ extension Tesla {
     }
   }
   
-  public static func exchange(code: String) async throws -> AuthToken {
-    let request = GenerateTokenRequest(code: code, kind: RefreshTokenRequest.fleetAPI)
-    return try await TeslaAPI.call(host: TeslaAPI.authHost, endpoint: TeslaAPI.authEndpoint, body: request, token: { nil }, onTokenRefresh: nil)
+  public static func exchange(code: String, audience: API.Region) async throws -> AuthToken {
+    let request = GenerateTokenRequest(code: code, kind: RefreshTokenRequest.fleetAPI, audience: audience.host)
+    return try await API.call(host: API.authHost, endpoint: API.authEndpoint, body: request, token: { nil }, onTokenRefresh: nil)
   }
 }

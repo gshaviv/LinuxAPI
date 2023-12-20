@@ -6,20 +6,20 @@ public typealias RefreshBlock = () async throws -> Bool
 public enum Tesla {
   public struct BackendAPI {
     public init(logger: ((String, String, Data?, String?, HTTPStatusCode?) -> Void)? = nil) {
-      TeslaAPI.logger = logger
+      API.logger = logger
     }
     
     public func releaseNotes(staged: Bool, id: Int64, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> ReleaseNotes {
-      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "release_notes?staged=\(staged)", token: token, onTokenRefresh: refresh)
+      try await API.call(endpoint: "api/1/vehicles", id, "release_notes?staged=\(staged)", token: token, onTokenRefresh: refresh)
     }
     
     public func command(_ cmd: TeslaCommand, id: Int64, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> CommandResponse {
       switch cmd {
       case .wake:
-        let r: Vehicle = try await TeslaAPI.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, token: token, onTokenRefresh: refresh)
+        let r: Vehicle = try await API.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, token: token, onTokenRefresh: refresh)
         return CommandResponse(result: r.state == .online, reason: r.state == .online ? "" : "failed to wakup", queued: nil)
       default:
-        return try await TeslaAPI.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, body: cmd.postParams, token: token, onTokenRefresh: refresh)
+        return try await API.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, body: cmd.postParams, token: token, onTokenRefresh: refresh)
       }
     }
     
@@ -36,16 +36,16 @@ public enum Tesla {
     }
     
     public func me(token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> Me {
-      try await TeslaAPI.call(endpoint: "api/1/users/me", token: token, onTokenRefresh: refresh)
+      try await API.call(endpoint: "api/1/users/me", token: token, onTokenRefresh: refresh)
     }
     
     public func recentAlerts(id: Int64, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> [Alert] {
-      let recent: RecentAlerts = try await TeslaAPI.call(endpoint: "/api/1/vehicles", id, "recent_alerts", token: token, onTokenRefresh: refresh)
+      let recent: RecentAlerts = try await API.call(endpoint: "/api/1/vehicles", id, "recent_alerts", token: token, onTokenRefresh: refresh)
       return recent.recentAlerts
     }
     
     public func share(location: String, id: Int64, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> CommandResponse {
-      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "command/share",
+      try await API.call(endpoint: "api/1/vehicles", id, "command/share",
                               body: ["type": "share_ext_content_raw",
                                      "locale": "en-US",
                                      "timestamp_ms": Int(Date().timeIntervalSince1970 * 1000),
@@ -57,15 +57,15 @@ public enum Tesla {
     }
     
     public func vehicles(token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> [Vehicle] {
-      try await TeslaAPI.call(endpoint: "api/1/vehicles", token: token, onTokenRefresh: refresh)
+      try await API.call(endpoint: "api/1/vehicles", token: token, onTokenRefresh: refresh)
     }
     
     public func getVehicle(id: Int64, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> Vehicle {
-      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, token: token, onTokenRefresh: refresh)
+      try await API.call(endpoint: "api/1/vehicles", id, token: token, onTokenRefresh: refresh)
     }
     
     public func getVehicleData(id: Int64, data: [DataEndpoint] = DataEndpoint.all, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> VehicleStates {
-      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "vehicle_data?endpoints=\(data.map(\.rawValue).joined(separator: "%3B"))", token: token, onTokenRefresh: refresh)
+      try await API.call(endpoint: "api/1/vehicles", id, "vehicle_data?endpoints=\(data.map(\.rawValue).joined(separator: "%3B"))", token: token, onTokenRefresh: refresh)
     }
     
     public struct RegionResult: Decodable {
@@ -79,7 +79,7 @@ public enum Tesla {
     }
     
     public func region(token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> RegionResult {
-      try await TeslaAPI.call(endpoint: "api/1/users/region", token: token, onTokenRefresh: refresh)
+      try await API.call(endpoint: "api/1/users/region", token: token, onTokenRefresh: refresh)
     }
     
     public struct Chargers: Decodable {
@@ -92,7 +92,7 @@ public enum Tesla {
     }
     
     public func chargingLocations(id: Int64, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> Chargers {
-      try await TeslaAPI.call(endpoint: "api/1/vehicles", id, "nearby_charging_sites", token: token, onTokenRefresh: refresh)
+      try await API.call(endpoint: "api/1/vehicles", id, "nearby_charging_sites", token: token, onTokenRefresh: refresh)
     }
   }
 }
