@@ -26,7 +26,6 @@ final class TeslaBackendAPITests: XCTestCase {
   var vehicleID: Int64!
   
   override class func setUp() {
-    loggingEnabled = true
     if UserDefaults.standard.data(forKey: "token") == nil {
       let str =
         """

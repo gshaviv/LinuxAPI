@@ -10,8 +10,6 @@ import Foundation
 import FoundationNetworking
 #endif
 
-var loggingEnabled = false
-
 protocol IntString {}
 extension String: IntString {}
 extension Int: IntString {}
@@ -141,8 +139,8 @@ extension Tesla {
       let data: Data
       do {
         data = try await session.data(for: request)
-        if let logger, let str = String(data: data, encoding: .utf8) {
-          logger(request.httpMethod ?? "GET", urlStr, request.httpBody, str, nil)
+        if logger != nil, let str = String(data: data, encoding: .utf8) {
+          logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, str, nil)
         }
       } catch HTTPError.statusCode(.unauthorized) {
         logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, nil, .unauthorized)
@@ -156,9 +154,7 @@ extension Tesla {
         }
         
       } catch HTTPError.statusCode(let code) {
-        if let logger {
-          logger(request.httpMethod ?? "GET", urlStr, request.httpBody, nil, code)
-        }
+        logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, nil, code)
         throw TeslaAPIError.network(code)
       }
       
