@@ -13,13 +13,30 @@ public enum Tesla {
       try await API.call(endpoint: "api/1/vehicles", id, "release_notes?staged=\(staged)", token: token, onTokenRefresh: refresh)
     }
     
-    public func command(_ cmd: TeslaCommand, id: Int64, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> CommandResponse {
+    public func command(_ cmd: TeslaCommand, id: Int64, vin: String, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> CommandResponse {
+      guard let readToken = await token() else {
+        throw TeslaAPIError.message("missing token")
+      }
+      let proxy = "https://myt-command-server.fly.dev"
       switch cmd {
       case .wake:
-        let r: Vehicle = try await API.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, token: token, onTokenRefresh: refresh)
-        return CommandResponse(result: r.state == .online, reason: r.state == .online ? "" : "failed to wakup", queued: nil)
+        if readToken.region == nil {
+          // owner api
+          let r: Vehicle = try await API.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, token: { readToken }, onTokenRefresh: refresh)
+          return CommandResponse(result: r.state == .online, queued: nil)
+        } else {
+          // fleet api
+          let r: Vehicle = try await API.call(host: proxy, endpoint: "api/1/vehicles", vin, cmd.path, method: .post, token: { readToken }, onTokenRefresh: refresh)
+          return CommandResponse(result: r.state == .online, queued: nil)
+        }
       default:
-        return try await API.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, body: cmd.postParams, token: token, onTokenRefresh: refresh)
+        if readToken.region == nil {
+          // old owner api
+          return try await API.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, body: cmd.postParams, token: { readToken }, onTokenRefresh: refresh)
+        } else {
+          // fleet api, use proxy
+          return try await API.call(host: proxy, endpoint: "api/1/vehicles", vin, cmd.path, method: .post, body: cmd.postParams, token: { readToken }, onTokenRefresh: refresh)
+        }
       }
     }
     
@@ -46,14 +63,14 @@ public enum Tesla {
     
     public func share(location: String, id: Int64, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> CommandResponse {
       try await API.call(endpoint: "api/1/vehicles", id, "command/share",
-                              body: ["type": "share_ext_content_raw",
-                                     "locale": "en-US",
-                                     "timestamp_ms": Int(Date().timeIntervalSince1970 * 1000),
-                                     "value": [
-                                       "android.intent.extra.TEXT": location
-                                     ]],
-                              token: token,
-                              onTokenRefresh: refresh)
+                         body: ["type": "share_ext_content_raw",
+                                "locale": "en-US",
+                                "timestamp_ms": Int(Date().timeIntervalSince1970 * 1000),
+                                "value": [
+                                  "android.intent.extra.TEXT": location
+                                ]],
+                         token: token,
+                         onTokenRefresh: refresh)
     }
     
     public func vehicles(token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> [Vehicle] {
@@ -129,57 +146,57 @@ public extension Tesla.BackendAPI {
     var path: String {
       switch self {
       case .cancelScheduledUpdate:
-        return "command/cancel_software_update"
+        "command/cancel_software_update"
       case .scheduleUpdate:
-        return "command/schedule_software_update"
+        "command/schedule_software_update"
       case .scheduledDepart:
-        return "command/set_scheduled_departure"
+        "command/set_scheduled_departure"
       case .scheduleCharge:
-        return "command/set_scheduled_charging"
+        "command/set_scheduled_charging"
       case .chargeCurrent:
-        return "command/set_charging_amps"
+        "command/set_charging_amps"
       case .cabinOverheatPtoection:
-        return "command/set_cabin_overheat_protection"
+        "command/set_cabin_overheat_protection"
       case .climateKeeperMode:
-        return "command/set_climate_keeper_mode"
+        "command/set_climate_keeper_mode"
       case .seatHeater:
-        return "command/remote_seat_heater_request"
+        "command/remote_seat_heater_request"
       case .vent:
-        return "command/window_control"
+        "command/window_control"
       case .sentry:
-        return "command/set_sentry_mode"
+        "command/set_sentry_mode"
       case .actuateTrunk:
-        return "command/actuate_trunk"
+        "command/actuate_trunk"
       case .wake:
-        return "wake_up"
+        "wake_up"
       case .start:
-        return "ommand/remote_start_drive"
+        "ommand/remote_start_drive"
       case .unlock:
-        return "command/door_unlock"
+        "command/door_unlock"
       case .lock:
-        return "command/door_lock"
+        "command/door_lock"
       case .honk:
-        return "command/honk_horn"
+        "command/honk_horn"
       case .flash:
-        return "command/flash_lights"
+        "command/flash_lights"
       case .startAC:
-        return "command/auto_conditioning_start"
+        "command/auto_conditioning_start"
       case .stopAC:
-        return "command/auto_conditioning_stop"
+        "command/auto_conditioning_stop"
       case .setTemprature:
-        return "command/set_temps"
+        "command/set_temps"
       case .chargeLimit:
-        return "command/set_charge_limit"
+        "command/set_charge_limit"
       case .openChargePort:
-        return "command/charge_port_door_open"
+        "command/charge_port_door_open"
       case .closeChargePort:
-        return "command/charge_port_door_close"
+        "command/charge_port_door_close"
       case .startCharging:
-        return "command/charge_start"
+        "command/charge_start"
       case .stopCharging:
-        return "command/charge_stop"
+        "command/charge_stop"
       case .valet:
-        return "command/set_valet_mode"
+        "command/set_valet_mode"
       }
     }
     
@@ -233,7 +250,7 @@ public extension Tesla.BackendAPI {
   
   struct CommandResponse: Codable {
     public let result: Bool
-    public let reason: String?
+//    public let reason: String?
     public let queued: Bool?
   }
   
