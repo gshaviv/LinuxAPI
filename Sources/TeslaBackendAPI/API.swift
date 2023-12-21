@@ -162,7 +162,12 @@ extension Tesla {
         let result = try teslaJSONDecoder.decode(TeslaResponse<R>.self, from: data)
         return result.response
       } else {
-        return try teslaJSONDecoder.decode(R.self, from: data)
+        do {
+          return try teslaJSONDecoder.decode(R.self, from: data)
+        } catch {
+          logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, (error as? LocalizedError)?.errorDescription ?? error.localizedDescription, nil)
+          throw error
+        }
       }
     }
     
@@ -278,7 +283,7 @@ extension Tesla {
     }
   }
   
-  private struct TeslaResponse<T: Decodable>: Decodable {
+  internal struct TeslaResponse<T: Decodable>: Decodable {
     let response: T
   }
   

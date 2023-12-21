@@ -26,8 +26,8 @@ public enum Tesla {
           return CommandResponse(result: r.state == .online, queued: nil)
         } else {
           // fleet api
-          let r: Vehicle = try await API.call(host: proxy, endpoint: "api/1/vehicles", vin, cmd.path, method: .post, token: { readToken }, onTokenRefresh: refresh)
-          return CommandResponse(result: r.state == .online, queued: nil)
+          let r: TeslaResponse<Vehicle> = try await API.call(host: proxy, endpoint: "api/1/vehicles", vin, cmd.path, method: .post, token: { readToken }, onTokenRefresh: refresh)
+          return CommandResponse(result: r.response.state == .online, queued: nil)
         }
       default:
         if readToken.region == nil {
@@ -35,7 +35,8 @@ public enum Tesla {
           return try await API.call(endpoint: "api/1/vehicles", id, cmd.path, method: .post, body: cmd.postParams, token: { readToken }, onTokenRefresh: refresh)
         } else {
           // fleet api, use proxy
-          return try await API.call(host: proxy, endpoint: "api/1/vehicles", vin, cmd.path, method: .post, body: cmd.postParams, token: { readToken }, onTokenRefresh: refresh)
+          let r: TeslaResponse<CommandResponse> = try await API.call(host: proxy, endpoint: "api/1/vehicles", vin, cmd.path, method: .post, body: cmd.postParams, token: { readToken }, onTokenRefresh: refresh)
+          return r.response
         }
       }
     }
