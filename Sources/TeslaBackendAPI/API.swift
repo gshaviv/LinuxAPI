@@ -93,15 +93,12 @@ extension Tesla {
                                            onTokenRefresh: RefreshBlock?) async throws -> R
     {
       let callRoot: String
-      let token: AuthToken?
+      let token = await tokenFetcher()
       if let host {
         callRoot = host
-        token = nil
       } else {
-        let fetchedToken = await tokenFetcher()
-        token = fetchedToken
         let region: Region
-        switch fetchedToken?.region {
+        switch token?.region {
         case .none:
           region = .noRegion
         case .northAmerica:
