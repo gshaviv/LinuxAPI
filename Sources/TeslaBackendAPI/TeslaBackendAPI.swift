@@ -5,7 +5,7 @@ public typealias RefreshBlock = () async throws -> Bool
 
 public enum Tesla {
   public struct BackendAPI {
-    public init(logger: ((String, String, Data?, String?, HTTPStatusCode?) -> Void)? = nil) {
+    public init(logger: ((String, String, Data?, String?, HTTPStatusCode?, [String: String]?) -> Void)? = nil) {
       API.logger = logger
     }
     

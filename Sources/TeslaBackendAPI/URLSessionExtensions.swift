@@ -13,7 +13,7 @@ import FoundationNetworking
 #if os(Linux)
 
 extension URLSession {
-  func data(from url: URL) async throws -> Data {
+  func data(from url: URL) async throws -> (Data, URLResponse) {
     try await withCheckedThrowingContinuation { continuation in
       let task = self.dataTask(with: url) { data, response, error in
         if let error {
@@ -24,23 +24,20 @@ extension URLSession {
           continuation.resume(throwing: URLError(.badServerResponse))
           return
         }
-        guard response.code == .ok else {
-          continuation.resume(throwing: HTTPError.statusCode(response.code))
-          return
-        }
         guard let data else {
           let error = URLError(.badServerResponse)
           return continuation.resume(throwing: error)
         }
 
-        continuation.resume(returning: data)
+        continuation.resume(returning: (data, URLResponse)
+        )
       }
 
       task.resume()
     }
   }
   
-  func data(for urlRequest: URLRequest) async throws -> Data {
+  func data(for urlRequest: URLRequest) async throws -> (Data, URLResponse) {
     try await withCheckedThrowingContinuation { continuation in
       let task = self.dataTask(with: urlRequest) { data, response, error in
         if let error {
@@ -51,43 +48,18 @@ extension URLSession {
           continuation.resume(throwing: URLError(.badServerResponse))
           return
         }
-        guard response.code == .ok else {
-          continuation.resume(throwing: HTTPError.statusCode(response.code))
-          return
-        }
         guard let data else {
           let error = URLError(.badServerResponse)
           return continuation.resume(throwing: error)
         }
         
-        continuation.resume(returning: data)
+        continuation.resume(returning: (data, response))
       }
       
       task.resume()
     }
   }
 }
-
-#else
-
-extension URLSession {
-  func data(from url: URL) async throws -> Data {
-    let (data, response) = try await self.data(from: url)
-    guard response.code == .ok else {
-      throw HTTPError.statusCode(response.code)
-    }
-    return data
-  }
-
-  func data(for urlRequst: URLRequest) async throws -> Data {
-    let (data, response) = try await self.data(for: urlRequst)
-    guard response.code == .ok else {
-      throw HTTPError.statusCode(response.code)
-    }
-    return data
-  }
-}
-
 #endif
 
 extension URLResponse {

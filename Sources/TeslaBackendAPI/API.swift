@@ -62,8 +62,8 @@ extension Tesla {
       return URLSession(configuration: config)
     }()
 
-    public static var logger: ((String, String, Data?, String?, HTTPStatusCode?) -> Void)?
-    
+   // (http method, url, body, body str, errorCode, response headers)
+   public static var logger: ((String, String, Data?, String?, HTTPStatusCode?, [String: String]?) -> Void)?
     static func call<R: Decodable>(host: String? = nil,
                                    endpoint: IntString...,
                                    method: HTTPMethod? = nil,
@@ -137,13 +137,20 @@ extension Tesla {
       request.setValue("TeslaSwift", forHTTPHeaderField: "User-Agent")
       
       let data: Data
+      var response: URLResponse? = nil
       do {
-        data = try await session.data(for: request)
+        (data, response) = try await session.data(for: request)
+        guard let response else {
+          throw URLError(.badServerResponse)
+        }
+        guard response.code == .ok else {
+          throw HTTPError.statusCode(response.code)
+        }
         if logger != nil, let str = String(data: data, encoding: .utf8) {
-          logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, str, nil)
+          logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, str, nil, (response as? HTTPURLResponse)?.allHeaderFields as? [String: String])
         }
       } catch HTTPError.statusCode(.unauthorized) {
-        logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, nil, .unauthorized)
+        logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, nil, .unauthorized, nil)
         guard let onTokenRefresh else {
           throw HTTPError.statusCode(.unauthorized)
         }
@@ -154,7 +161,7 @@ extension Tesla {
         }
         
       } catch HTTPError.statusCode(let code) {
-        logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, nil, code)
+        logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, nil, code, (response as? HTTPURLResponse)?.allHeaderFields as? [String: String])
         throw TeslaAPIError.network(code)
       }
       
@@ -165,7 +172,7 @@ extension Tesla {
         do {
           return try teslaJSONDecoder.decode(R.self, from: data)
         } catch {
-          logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, (error as? LocalizedError)?.errorDescription ?? error.localizedDescription, nil)
+          logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, (error as? LocalizedError)?.errorDescription ?? error.localizedDescription, nil, nil)
           throw error
         }
       }
