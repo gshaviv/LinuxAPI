@@ -18,14 +18,14 @@ extension Int64: IntString {}
 extension Tesla {
   public enum TeslaAPIError: Error, LocalizedError {
     case badURL
-    case network(HTTPStatusCode)
+    case network(HTTPStatusCode, [String: String]?)
     case refreshTokenMissing
     case message(String)
     
     public var errorDescription: String? {
       switch self {
       case .badURL: return "bad URL"
-      case .network(let code): return "network status: \(code)"
+      case .network(let code, _): return "network status: \(code)"
       case .refreshTokenMissing: return "Refresh token missing"
       case .message(let string): return string
       }
@@ -162,7 +162,7 @@ extension Tesla {
         
       } catch HTTPError.statusCode(let code) {
         logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, nil, code, (response as? HTTPURLResponse)?.allHeaderFields as? [String: String])
-        throw TeslaAPIError.network(code)
+        throw TeslaAPIError.network(code, (response as? HTTPURLResponse)?.allHeaderFields as? [String: String])
       }
       
       if host == nil {
