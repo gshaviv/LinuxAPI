@@ -62,15 +62,15 @@ extension Tesla {
       return URLSession(configuration: config)
     }()
 
-   // (http method, url, body, body str, errorCode, response headers)
-   public static var logger: ((String, String, Data?, String?, HTTPStatusCode?, [String: String]?) -> Void)?
+   // (http method, url, body, body str, errorCode, response headers), "file:line"
+   public static var logger: ((String, String, Data?, String?, HTTPStatusCode?, [String: String]?, String) -> Void)?
     static func call<R: Decodable>(host: String? = nil,
                                    endpoint: IntString...,
                                    method: HTTPMethod? = nil,
                                    token: () async -> AuthToken?,
-                                   onTokenRefresh: RefreshBlock?) async throws -> R
+                                   onTokenRefresh: RefreshBlock?, logNotes: String) async throws -> R
     {
-      try await call(host: host, endpoint: endpoint, method: method, body: false, token: token, onTokenRefresh: onTokenRefresh)
+      try await call(host: host, endpoint: endpoint, method: method, body: false, token: token, onTokenRefresh: onTokenRefresh, logNotes: logNotes)
     }
     
     static func call<R: Decodable>(host: String? = nil,
@@ -78,9 +78,10 @@ extension Tesla {
                                    method: HTTPMethod? = nil,
                                    body: Any,
                                    token: () async -> AuthToken?,
-                                   onTokenRefresh: RefreshBlock?) async throws -> R
+                                   onTokenRefresh: RefreshBlock?,
+                                   logNotes: String) async throws -> R
     {
-      try await call(host: host, endpoint: endpoint, method: method, body: body, token: token, onTokenRefresh: onTokenRefresh)
+      try await call(host: host, endpoint: endpoint, method: method, body: body, token: token, onTokenRefresh: onTokenRefresh, logNotes: logNotes)
     }
     
     private static func call<R: Decodable>(host: String?,
@@ -88,7 +89,8 @@ extension Tesla {
                                            method: HTTPMethod?,
                                            body: Any,
                                            token tokenFetcher: () async -> AuthToken?,
-                                           onTokenRefresh: RefreshBlock?) async throws -> R
+                                           onTokenRefresh: RefreshBlock?,
+                                           logNotes: String) async throws -> R
     {
       let callRoot: String
       let token = await tokenFetcher()
@@ -147,21 +149,21 @@ extension Tesla {
           throw HTTPError.statusCode(response.code)
         }
         if logger != nil, let str = String(data: data, encoding: .utf8) {
-          logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, str, nil, (response as? HTTPURLResponse)?.allHeaderFields as? [String: String])
+          logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, str, nil, (response as? HTTPURLResponse)?.allHeaderFields as? [String: String], logNotes)
         }
       } catch HTTPError.statusCode(.unauthorized) {
-        logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, nil, .unauthorized, nil)
+        logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, nil, .unauthorized, nil, logNotes)
         guard let onTokenRefresh else {
           throw HTTPError.statusCode(.unauthorized)
         }
         if try await onTokenRefresh() {
-          return try await call(host: host, endpoint: endpoint, method: method, body: body, token: tokenFetcher, onTokenRefresh: nil)
+          return try await call(host: host, endpoint: endpoint, method: method, body: body, token: tokenFetcher, onTokenRefresh: nil, logNotes: logNotes)
         } else {
           throw HTTPError.statusCode(.unauthorized)
         }
         
       } catch HTTPError.statusCode(let code) {
-        logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, nil, code, (response as? HTTPURLResponse)?.allHeaderFields as? [String: String])
+        logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, nil, code, (response as? HTTPURLResponse)?.allHeaderFields as? [String: String], logNotes)
         throw TeslaAPIError.network(code, (response as? HTTPURLResponse)?.allHeaderFields as? [String: String])
       }
       
@@ -172,7 +174,7 @@ extension Tesla {
         do {
           return try teslaJSONDecoder.decode(R.self, from: data)
         } catch {
-          logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, (error as? LocalizedError)?.errorDescription ?? error.localizedDescription, nil, nil)
+          logger?(request.httpMethod ?? "GET", urlStr, request.httpBody, (error as? LocalizedError)?.errorDescription ?? error.localizedDescription, nil, nil, logNotes)
           throw error
         }
       }
@@ -304,7 +306,7 @@ extension Tesla {
           throw TeslaAPIError.refreshTokenMissing
         }
         let request = RefreshTokenRequest(refreshToken: refreshToken, kind: region == nil ? RefreshTokenRequest.ownerAPI : RefreshTokenRequest.fleetAPI)
-        var refreshedToken: AuthToken = try await API.call(host: API.authHost, endpoint: API.authEndpoint, body: request, token: { nil }, onTokenRefresh: nil)
+        var refreshedToken: AuthToken = try await API.call(host: API.authHost, endpoint: API.authEndpoint, body: request, token: { nil }, onTokenRefresh: nil, logNotes: "refresh")
         refreshedToken.region = region
         refreshedToken.createdNow()
         return refreshedToken
@@ -336,6 +338,6 @@ extension Tesla {
   
   public static func exchange(code: String) async throws -> AuthToken {
     let request = GenerateTokenRequest(code: code, kind: RefreshTokenRequest.fleetAPI, audience: [API.Region.northAmeria, API.Region.europe].map { $0.host }.joined(separator: " "))
-    return try await API.call(host: API.authHost, endpoint: API.authEndpoint, body: request, token: { nil }, onTokenRefresh: nil)
+    return try await API.call(host: API.authHost, endpoint: API.authEndpoint, body: request, token: { nil }, onTokenRefresh: nil, logNotes: "exchange")
   }
 }
