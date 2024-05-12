@@ -9,11 +9,13 @@ public enum Tesla {
       API.logger = logger
     }
     
-    public func releaseNotes(notes: String = "\(#file):\(#line)", staged: Bool, id: Int64, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> ReleaseNotes {
-      try await API.call(endpoint: "api/1/vehicles", id, "release_notes?staged=\(staged)", token: token, onTokenRefresh: refresh, logNotes: notes)
+    public func releaseNotes(file: String = #file, line: Int = #line, staged: Bool, id: Int64, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> ReleaseNotes {
+      let notes = "\(file.components(separatedBy: "/").last ?? file):\(line)"
+      return try await API.call(endpoint: "api/1/vehicles", id, "release_notes?staged=\(staged)", token: token, onTokenRefresh: refresh, logNotes: notes)
     }
     
-    public func command(notes: String = "\(#file):\(#line)", _ cmd: TeslaCommand, id: Int64, vin: String, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> CommandResponse {
+    public func command(file: String = #file, line: Int = #line, _ cmd: TeslaCommand, id: Int64, vin: String, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> CommandResponse {
+            let notes = "\(file.components(separatedBy: "/").last ?? file):\(line)"
       guard let readToken = await token() else {
         throw TeslaAPIError.message("missing token")
       }
@@ -53,17 +55,20 @@ public enum Tesla {
       }
     }
     
-    public func me(notes: String = "\(#file):\(#line)", token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> Me {
-      try await API.call(endpoint: "api/1/users/me", token: token, onTokenRefresh: refresh, logNotes: notes)
+    public func me(file: String = #file, line: Int = #line, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> Me {
+            let notes = "\(file.components(separatedBy: "/").last ?? file):\(line)"
+      return try await API.call(endpoint: "api/1/users/me", token: token, onTokenRefresh: refresh, logNotes: notes)
     }
     
-    public func recentAlerts(notes: String = "\(#file):\(#line)", id: Int64, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> [Alert] {
+    public func recentAlerts(file: String = #file, line: Int = #line, id: Int64, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> [Alert] {
+            let notes = "\(file.components(separatedBy: "/").last ?? file):\(line)"
       let recent: RecentAlerts = try await API.call(endpoint: "/api/1/vehicles", id, "recent_alerts", token: token, onTokenRefresh: refresh, logNotes: notes)
       return recent.recentAlerts
     }
     
-    public func share(notes: String = "\(#file):\(#line)", location: String, id: Int64, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> CommandResponse {
-      try await API.call(endpoint: "api/1/vehicles", id, "command/share",
+    public func share(file: String = #file, line: Int = #line, location: String, id: Int64, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> CommandResponse {
+            let notes = "\(file.components(separatedBy: "/").last ?? file):\(line)"
+      return try await API.call(endpoint: "api/1/vehicles", id, "command/share",
                          body: ["type": "share_ext_content_raw",
                                 "locale": "en-US",
                                 "timestamp_ms": Int(Date().timeIntervalSince1970 * 1000),
@@ -74,16 +79,19 @@ public enum Tesla {
                          onTokenRefresh: refresh, logNotes: notes)
     }
     
-    public func vehicles(notes: String = "\(#file):\(#line)", token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> [Vehicle] {
-      try await API.call(endpoint: "api/1/vehicles", token: token, onTokenRefresh: refresh, logNotes: notes)
+    public func vehicles(file: String = #file, line: Int = #line, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> [Vehicle] {
+            let notes = "\(file.components(separatedBy: "/").last ?? file):\(line)"
+      return try await API.call(endpoint: "api/1/vehicles", token: token, onTokenRefresh: refresh, logNotes: notes)
     }
     
-    public func getVehicle(notes: String = "\(#file):\(#line)", id: Int64, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> Vehicle {
-      try await API.call(endpoint: "api/1/vehicles", id, token: token, onTokenRefresh: refresh, logNotes: notes)
+    public func getVehicle(file: String = #file, line: Int = #line, id: Int64, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> Vehicle {
+            let notes = "\(file.components(separatedBy: "/").last ?? file):\(line)"
+      return try await API.call(endpoint: "api/1/vehicles", id, token: token, onTokenRefresh: refresh, logNotes: notes)
     }
     
-    public func getVehicleData(notes: String = "\(#file):\(#line)", id: Int64, data: [DataEndpoint] = DataEndpoint.all, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> VehicleStates {
-      try await API.call(endpoint: "api/1/vehicles", id, "vehicle_data?endpoints=\(data.map(\.rawValue).joined(separator: "%3B"))", token: token, onTokenRefresh: refresh, logNotes: notes)
+    public func getVehicleData(file: String = #file, line: Int = #line, id: Int64, data: [DataEndpoint] = DataEndpoint.all, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> VehicleStates {
+            let notes = "\(file.components(separatedBy: "/").last ?? file):\(line)"
+      return try await API.call(endpoint: "api/1/vehicles", id, "vehicle_data?endpoints=\(data.map(\.rawValue).joined(separator: "%3B"))", token: token, onTokenRefresh: refresh, logNotes: notes)
     }
     
     public struct RegionResult: Decodable {
@@ -96,8 +104,9 @@ public enum Tesla {
       }
     }
     
-    public func region(notes: String = "\(#file):\(#line)", token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> RegionResult {
-      try await API.call(endpoint: "api/1/users/region", token: token, onTokenRefresh: refresh, logNotes: notes)
+    public func region(file: String = #file, line: Int = #line, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> RegionResult {
+            let notes = "\(file.components(separatedBy: "/").last ?? file):\(line)"
+      return try await API.call(endpoint: "api/1/users/region", token: token, onTokenRefresh: refresh, logNotes: notes)
     }
     
     public struct Chargers: Decodable {
@@ -109,8 +118,9 @@ public enum Tesla {
       }
     }
     
-    public func chargingLocations(notes: String = "\(#file):\(#line)", id: Int64, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> Chargers {
-      try await API.call(endpoint: "api/1/vehicles", id, "nearby_charging_sites", token: token, onTokenRefresh: refresh, logNotes: notes)
+    public func chargingLocations(file: String = #file, line: Int = #line, id: Int64, token: () async -> AuthToken?, refresh: @escaping RefreshBlock) async throws -> Chargers {
+            let notes = "\(file.components(separatedBy: "/").last ?? file):\(line)"
+      return try await API.call(endpoint: "api/1/vehicles", id, "nearby_charging_sites", token: token, onTokenRefresh: refresh, logNotes: notes)
     }
   }
 }
